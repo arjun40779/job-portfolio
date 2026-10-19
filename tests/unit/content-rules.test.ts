@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   contentErrors,
   hasCaseStudyPage,
+  showsCover,
+  showsDiagram,
   sortExperience,
   visibleProjects,
   type ExperienceLike,
@@ -217,5 +219,41 @@ describe("hasCaseStudyPage", () => {
     expect(hasCaseStudyPage({ ...ready, featuredRank: undefined }, true)).toBe(
       false,
     );
+  });
+});
+
+describe("showsDiagram", () => {
+  it("hides unapproved diagrams from production", () => {
+    expect(showsDiagram({ diagram: "x", diagramApproved: false }, false)).toBe(
+      false,
+    );
+  });
+
+  it("shows approved diagrams, and every diagram in draft builds", () => {
+    expect(showsDiagram({ diagram: "x", diagramApproved: true }, false)).toBe(
+      true,
+    );
+    expect(showsDiagram({ diagram: "x", diagramApproved: false }, true)).toBe(
+      true,
+    );
+  });
+
+  it("needs a diagram to show one", () => {
+    expect(showsDiagram({ diagramApproved: true }, true)).toBe(false);
+  });
+});
+
+describe("showsCover", () => {
+  it("ships approved screenshots and holds back unapproved ones", () => {
+    expect(showsCover({ cover: {}, coverApproved: true }, false)).toBe(true);
+    expect(showsCover({ cover: {}, coverApproved: false }, false)).toBe(false);
+  });
+
+  it("shows every screenshot in draft builds", () => {
+    expect(showsCover({ cover: {}, coverApproved: false }, true)).toBe(true);
+  });
+
+  it("needs a screenshot to show one", () => {
+    expect(showsCover({ coverApproved: true }, true)).toBe(false);
   });
 });

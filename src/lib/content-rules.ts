@@ -53,6 +53,24 @@ export function hasCaseStudyPage(
   );
 }
 
+/** Screenshots ship once approved (the default); drafts show them all. */
+export function showsCover(
+  project: { cover?: unknown; coverApproved: boolean },
+  showDrafts: boolean,
+): boolean {
+  return project.cover !== undefined && (project.coverApproved || showDrafts);
+}
+
+/** Diagrams of private systems ship only once approved; drafts show them. */
+export function showsDiagram(
+  project: { diagram?: string | undefined; diagramApproved: boolean },
+  showDrafts: boolean,
+): boolean {
+  return (
+    project.diagram !== undefined && (project.diagramApproved || showDrafts)
+  );
+}
+
 /** Newest role first, regardless of order in the JSON file. */
 export function sortExperience<T extends ExperienceLike>(items: T[]): T[] {
   return [...items].sort((a, b) => b.start.localeCompare(a.start));
