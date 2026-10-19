@@ -1,0 +1,28 @@
+---
+interface Props {
+  as?: "div" | "article" | "li";
+  /** Use "bg" for cards placed on a --surface section band. */
+  tone?: "surface" | "bg";
+  interactive?: boolean;
+  class?: string;
+}
+
+const {
+  as: Tag = "div",
+  tone = "surface",
+  interactive = false,
+  class: className,
+} = Astro.props;
+---
+
+<Tag
+  class:list={[
+    "group overflow-hidden rounded-card",
+    tone === "surface" ? "bg-surface" : "bg-bg",
+    interactive &&
+      "transition-shadow duration-200 hover:shadow-[0_4px_24px_rgb(0_0_0/0.08)] motion-reduce:transition-none",
+    className,
+  ]}
+>
+  <slot />
+</Tag>

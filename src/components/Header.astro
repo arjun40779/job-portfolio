@@ -1,0 +1,40 @@
+---
+import { navLinks, resumeHref, site } from "../lib/site";
+import Button from "./Button.astro";
+import Container from "./Container.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+---
+
+<header class="sticky top-0 z-40 border-b border-divider bg-(--header-bg) backdrop-blur-[20px] backdrop-saturate-[1.8]">
+  <!--
+    DOM order matches the desktop row: wordmark, links, Résumé, theme.
+    On mobile the links and Résumé wrap to a second row (no menu needed).
+  -->
+  <Container class="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 py-2 md:flex md:h-13 md:py-0">
+    <a
+      href="/"
+      class="col-start-1 row-start-1 text-[15px] font-semibold text-text hover:text-text hover:no-underline"
+    >
+      {site.name}
+    </a>
+    <nav aria-label="Primary" class="col-span-2 row-start-2 md:ml-auto">
+      <ul class="flex items-center gap-x-4 text-meta md:gap-x-6">
+        {navLinks.map(({ label, href }) => (
+          <li>
+            <a href={href} class="text-text hover:text-link">
+              {label}
+            </a>
+          </li>
+        ))}
+        <li class="ml-auto md:ml-0">
+          <Button href={resumeHref} size="sm">
+            Résumé
+          </Button>
+        </li>
+      </ul>
+    </nav>
+    <div class="col-start-2 row-start-1 flex justify-end">
+      <ThemeToggle />
+    </div>
+  </Container>
+</header>
