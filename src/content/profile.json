@@ -15,7 +15,7 @@
     },
     "resume": {
       "path": "/resume.pdf",
-      "published": false
+      "published": true
     },
     "about": "I like owning a feature completely, from the database schema and the API to the tests and the interface people actually use. Lately that has meant authentication, social graphs and feeds on Fastify, PostgreSQL, Neo4j and Redis. Before that I built CMS-driven frontends for enterprise teams on Sitecore, Contentful and Sanity.",
     "education": [
