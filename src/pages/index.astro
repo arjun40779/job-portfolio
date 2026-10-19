@@ -5,10 +5,43 @@ import Experience from "../components/sections/Experience.astro";
 import FeaturedWork from "../components/sections/FeaturedWork.astro";
 import Hero from "../components/sections/Hero.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { getSiteContent } from "../lib/content";
+
+// ProfilePage structured data (§7.4). It helps search engines understand the
+// profile; it doesn't guarantee any special search result.
+const { profile, experience, skills } = await getSiteContent();
+const current = experience.find((role) => role.end === null);
+const siteUrl = Astro.site?.toString() ?? "https://arjun.buzz/";
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  url: siteUrl,
+  mainEntity: {
+    "@type": "Person",
+    name: profile.name,
+    jobTitle: profile.title,
+    description: profile.statement,
+    url: siteUrl,
+    email: `mailto:${profile.email}`,
+    image: new URL("/og/home.png", siteUrl).toString(),
+    sameAs: [profile.socials.github, profile.socials.linkedin],
+    ...(current && {
+      worksFor: { "@type": "Organization", name: current.company },
+    }),
+    address: { "@type": "PostalAddress", addressCountry: "IN" },
+    alumniOf: profile.education
+      .filter((item) => item.id.endsWith("bsc"))
+      .map((item) => ({
+        "@type": "CollegeOrUniversity",
+        name: item.institution,
+      })),
+    knowsAbout: skills.flatMap((group) => group.items.map((item) => item.name)),
+  },
+};
 ---
 
 <!-- Evidence first, then context (docs/DESIGN.md §3). -->
-<BaseLayout>
+<BaseLayout jsonLd={jsonLd}>
   <Hero />
   <FeaturedWork />
   <Experience />
