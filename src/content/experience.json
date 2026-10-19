@@ -1,0 +1,63 @@
+[
+  {
+    "id": "updot-pexit",
+    "company": "Updot",
+    "product": "Pexit",
+    "role": "Software Engineer, Full Stack",
+    "start": "2026-07",
+    "end": null,
+    "bullets": [
+      "Rebuilt authentication end to end: split access and refresh JWTs bound to Redis sessions, AES-256-GCM token encryption, and OTP and global rate limiting.",
+      "Built the Neo4j social-graph module that powers connections, mutual-connection lookups and recommendation candidates.",
+      "Built the posts, comments and feed module on Fastify and PostgreSQL, with visibility rules and blocking-aware feeds, plus its React UI."
+    ],
+    "tech": [
+      "Fastify",
+      "TypeScript",
+      "PostgreSQL",
+      "Neo4j",
+      "Redis",
+      "React",
+      "Nx"
+    ]
+  },
+  {
+    "id": "freelance",
+    "company": "Self-employed",
+    "role": "Freelance Frontend Engineer",
+    "start": "2026-01",
+    "end": "2026-06",
+    "location": "Remote",
+    "bullets": [
+      "Delivered two client products end to end, from requirements to deployment: PGSinKokrajhar, a booking platform, and HorizonVision Group, a CMS-driven agency site."
+    ],
+    "tech": ["Next.js", "Sanity", "Supabase"]
+  },
+  {
+    "id": "koru-ux",
+    "company": "Koru UX Design",
+    "product": "JSCAPE MFT SaaS",
+    "role": "Software Engineer (Frontend / CMS)",
+    "start": "2025-08",
+    "end": "2025-12",
+    "bullets": [
+      "Led the React and Next.js modernisation of the product frontend, integrated with Sitecore CMS.",
+      "Redesigned 20+ enterprise screens onto a shared, CMS-driven component system for consistent workflows.",
+      "Designed and integrated REST APIs with the backend team for data- and CMS-driven workflows."
+    ],
+    "tech": ["React", "Next.js", "Sitecore"]
+  },
+  {
+    "id": "incero-ai",
+    "company": "Incero.ai",
+    "role": "Software Engineer (Frontend / CMS & Commerce)",
+    "start": "2024-03",
+    "end": "2025-08",
+    "bullets": [
+      "Built Next.js and TypeScript applications on Sitecore, Contentful, Sanity and Strapi.",
+      "Developed composable commerce on Sitecore OrderCloud, with JWT authentication and role-based access control.",
+      "Moved CMS pages to SSR/ISR and split client bundles to cut shipped JavaScript."
+    ],
+    "tech": ["Next.js", "TypeScript", "Sitecore", "Contentful", "OrderCloud"]
+  }
+]

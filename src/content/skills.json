@@ -1,0 +1,40 @@
+[
+  {
+    "id": "backend",
+    "title": "Backend",
+    "items": [
+      { "name": "Node.js and Fastify", "usedIn": ["pexit"] },
+      { "name": "PostgreSQL", "usedIn": ["pexit"] },
+      { "name": "Neo4j and Cypher", "usedIn": ["pexit"] },
+      { "name": "Redis", "usedIn": ["pexit"] },
+      { "name": "Supabase", "usedIn": ["pginkokrajhar", "pexit"] },
+      {
+        "name": "Auth and security (JWT rotation, RBAC, AES-256-GCM)",
+        "usedIn": ["pexit", "incero-ai"]
+      }
+    ]
+  },
+  {
+    "id": "frontend",
+    "title": "Frontend",
+    "items": [
+      { "name": "React and TypeScript", "usedIn": ["pexit", "koru-ux"] },
+      { "name": "Next.js", "usedIn": ["pginkokrajhar", "incero-ai"] },
+      { "name": "Tailwind CSS", "usedIn": [] },
+      {
+        "name": "Headless CMS (Sitecore, Contentful, Sanity, Strapi)",
+        "usedIn": ["incero-ai", "koru-ux", "horizonvision-group"]
+      }
+    ]
+  },
+  {
+    "id": "delivery",
+    "title": "Delivery",
+    "items": [
+      { "name": "Testing (Vitest, Playwright, RTL, MSW)", "usedIn": ["pexit"] },
+      { "name": "Nx and pnpm monorepos", "usedIn": ["pexit"] },
+      { "name": "OpenAPI documentation", "usedIn": ["pexit"] },
+      { "name": "Vercel, Cloudflare Workers, AWS, Docker", "usedIn": [] }
+    ]
+  }
+]

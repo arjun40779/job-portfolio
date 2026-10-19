@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { revealAll } from "./helpers";
 
 const routes = ["/", "/404", "/styleguide"];
 
@@ -56,6 +57,7 @@ test.describe("site shell", () => {
   for (const route of routes) {
     test(`no axe violations on ${route}`, async ({ page }) => {
       await page.goto(route);
+      await revealAll(page);
       const results = await new AxeBuilder({ page }).analyze();
       expect(results.violations).toEqual([]);
     });
@@ -82,9 +84,10 @@ test.describe("without JavaScript", () => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(page.locator("[data-theme-toggle]")).toBeHidden();
-    await expect(page.getByRole("link", { name: "Email me" })).toHaveAttribute(
-      "href",
-      "mailto:arjun40779@gmail.com",
-    );
+    await expect(
+      page
+        .locator("#contact")
+        .getByRole("link", { name: "arjun40779@gmail.com" }),
+    ).toHaveAttribute("href", "mailto:arjun40779@gmail.com");
   });
 });

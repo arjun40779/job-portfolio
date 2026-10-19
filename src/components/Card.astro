@@ -1,10 +1,12 @@
 ---
 interface Props {
-  as?: "div" | "article" | "li";
+  as?: "div" | "article" | "li" | "section";
   /** Use "bg" for cards placed on a --surface section band. */
   tone?: "surface" | "bg";
   interactive?: boolean;
   class?: string;
+  id?: string;
+  "aria-labelledby"?: string;
 }
 
 const {
@@ -12,6 +14,7 @@ const {
   tone = "surface",
   interactive = false,
   class: className,
+  ...rest
 } = Astro.props;
 ---
 
@@ -23,6 +26,7 @@ const {
       "transition-shadow duration-200 hover:shadow-[0_4px_24px_rgb(0_0_0/0.08)] motion-reduce:transition-none",
     className,
   ]}
+  {...rest}
 >
   <slot />
 </Tag>

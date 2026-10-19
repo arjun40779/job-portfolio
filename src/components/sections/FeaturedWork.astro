@@ -1,0 +1,67 @@
+---
+import { getSiteContent } from "../../lib/content";
+import Container from "../Container.astro";
+import ExternalLink from "../ExternalLink.astro";
+import FeaturedProjectCard from "../FeaturedProjectCard.astro";
+import SectionHeading from "../SectionHeading.astro";
+import Tag from "../Tag.astro";
+
+const { featured, clientWork } = await getSiteContent();
+const [lead, ...rest] = featured;
+---
+
+<section
+  id="work"
+  aria-labelledby="work-heading"
+  class="bg-surface py-16 md:py-24"
+>
+  <Container>
+    <SectionHeading id="work-heading" eyebrow="Selected work">
+      Things I've built
+    </SectionHeading>
+
+    {lead && (
+      <div data-reveal class="flex">
+        <FeaturedProjectCard project={lead} size="lg" />
+      </div>
+    )}
+
+    {rest.length > 0 && (
+      <div class="mt-6 grid gap-6 md:grid-cols-2">
+        {rest.map((project) => (
+          <div data-reveal class="flex">
+            <FeaturedProjectCard project={project} />
+          </div>
+        ))}
+      </div>
+    )}
+
+    {clientWork.length > 0 && (
+      <div data-reveal class="mt-14">
+        <h3 class="text-h3">Client work</h3>
+        <p class="mt-1 text-meta text-text-muted">
+          Contributed to as part of agency teams.
+        </p>
+        <ul class="mt-4 divide-y divide-divider border-y border-divider">
+          {clientWork.map((client) => (
+            <li class="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+              <div>
+                <span class="font-medium">{client.title}</span>
+                {client.draft && <Tag class="ml-2">Draft</Tag>}
+                <span class="block text-meta text-text-muted sm:inline">
+                  <span class="hidden sm:inline"> · </span>
+                  {client.summary}
+                </span>
+              </div>
+              {client.live && (
+                <ExternalLink href={client.live} class="shrink-0 text-meta">
+                  Visit site<span class="sr-only"> ({client.title})</span>
+                </ExternalLink>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </Container>
+</section>
