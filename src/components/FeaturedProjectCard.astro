@@ -1,5 +1,6 @@
 ---
-import type { Project } from "../lib/content";
+import { caseStudyHref, type Project } from "../lib/content";
+import Button from "./Button.astro";
 import Card from "./Card.astro";
 import ExternalLink from "./ExternalLink.astro";
 import ProjectMedia from "./ProjectMedia.astro";
@@ -63,8 +64,13 @@ const titleId = `project-${project.id}-title`;
         </li>
       ))}
     </ul>
-    {(project.live || project.code) && (
-      <div class="mt-auto flex flex-wrap gap-x-6 pt-6 text-meta">
+    {(project.caseStudy || project.live || project.code) && (
+      <div class="mt-auto flex flex-wrap items-baseline gap-x-6 gap-y-2 pt-6 text-meta">
+        {project.caseStudy && (
+          <Button variant="text" href={caseStudyHref(project)}>
+            Read case study<span class="sr-only"> ({project.title})</span>
+          </Button>
+        )}
         {project.live && (
           <ExternalLink href={project.live}>
             Visit site<span class="sr-only"> ({project.title})</span>

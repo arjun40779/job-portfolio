@@ -5,15 +5,41 @@ ownership: freelance-client
 featuredRank: 3
 facts:
   role: Sole developer (freelance)
-  team: Solo
-  timeline: "2026"
+  team: Solo, with the agency's marketing lead
+  timeline: Apr – Jun 2026
   scope: Content model and site
 contribution: I designed the Sanity content model and built the site on top of it.
 outcome: The agency now edits its marketing copy in the CMS without code changes.
 publicationApproved: true
 caseStudyApproved: true
+# Placeholder case study text written for layout review. Replace it with the
+# real story, then remove this flag to publish the page (DESIGN.md §8.2).
+placeholderContent: true
 live: https://horizonvisiongroup.com
-tags: [Sanity]
+tags: [Sanity, Next.js]
 ---
 
-{/* Case study arrives in M4. */}
+## Problem
+
+HorizonVision's previous site was a purchased template. Every change to a headline, a service description or the portfolio needed a developer, so the site lagged months behind the agency's actual work. The showreel and project pages were the part clients looked at most, and they were the most out of date.
+
+## What I built
+
+- **A content model around how the agency talks about its work.** Sanity documents for services, projects (with video, client, deliverables and credits) and pages, plus shared settings for navigation and contact details.
+- **Composable page sections.** Pages are built from a small set of section blocks, such as hero, project grid, services list and call to action, which the marketing lead arranges in Sanity Studio.
+- **Project pages generated from content.** Adding a project in the CMS creates its page, adds it to the portfolio grid and links it from the related service.
+- **A fast, media-heavy frontend.** Next.js with statically generated pages, responsive images from Sanity's image pipeline and lazy-loaded video embeds behind poster images.
+
+## Key decisions
+
+**A handful of section blocks, not a free-form page builder.** A fully flexible builder would have let the site drift off-brand. Six well-designed blocks covered every page the agency needed while keeping layouts consistent.
+
+**Video behind a poster image.** Embedding several players on load made pages heavy. Each video shows a lightweight poster first and loads the player only when someone presses play, which keeps the portfolio grid quick on mobile.
+
+**Live preview in the Studio.** Editors see their changes rendered in the real site layout before publishing, which made the marketing lead comfortable editing without asking for a review.
+
+## Results
+
+- The marketing team now updates copy, services and projects in Sanity without a developer.
+- New projects go from footage to a published page in the same day.
+- Every page shares the same set of blocks, so the site stays consistent as it grows.

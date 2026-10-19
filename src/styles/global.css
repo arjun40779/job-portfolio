@@ -213,6 +213,50 @@
   }
 }
 
+/* Case study body text rendered from MDX (§3). */
+@layer components {
+  .case-study > h2 {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--line-height);
+    font-weight: 600;
+  }
+
+  .case-study > h2:first-child {
+    margin-top: 0;
+  }
+
+  .case-study > p,
+  .case-study > ul {
+    max-width: 68ch;
+    margin-bottom: 1rem;
+  }
+
+  .case-study > ul {
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  .case-study li + li {
+    margin-top: 0.5rem;
+  }
+
+  .case-study li::marker {
+    color: var(--text-muted);
+  }
+
+  .case-study strong {
+    font-weight: 600;
+  }
+
+  .case-study li a,
+  .case-study p a {
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+  }
+}
+
 /*
  * Reveal on scroll (§4.7). Hidden only when JS is available and motion is
  * allowed. If the reveal script never runs, the fallback animation shows

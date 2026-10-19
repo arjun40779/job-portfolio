@@ -3,7 +3,11 @@
     "collect": {
       "startServerCommand": "pnpm preview --port 4322 --ignore-lock",
       "startServerReadyPattern": "localhost:4322",
-      "url": ["http://localhost:4322/"],
+      "url": [
+        "http://localhost:4322/",
+        "http://localhost:4322/projects/pexit/",
+        "http://localhost:4322/projects/pginkokrajhar/"
+      ],
       "numberOfRuns": 5,
       "settings": {
         "throttlingMethod": "simulate",
@@ -14,35 +18,59 @@
       "assertions": {
         "categories:performance": [
           "error",
-          { "minScore": 0.95, "aggregationMethod": "median-run" }
+          {
+            "minScore": 0.95,
+            "aggregationMethod": "median-run"
+          }
         ],
         "categories:accessibility": [
           "error",
-          { "minScore": 1, "aggregationMethod": "median-run" }
+          {
+            "minScore": 1,
+            "aggregationMethod": "median-run"
+          }
         ],
         "categories:best-practices": [
           "error",
-          { "minScore": 0.95, "aggregationMethod": "median-run" }
+          {
+            "minScore": 0.95,
+            "aggregationMethod": "median-run"
+          }
         ],
         "categories:seo": [
           "error",
-          { "minScore": 1, "aggregationMethod": "median-run" }
+          {
+            "minScore": 1,
+            "aggregationMethod": "median-run"
+          }
         ],
         "largest-contentful-paint": [
           "error",
-          { "maxNumericValue": 1800, "aggregationMethod": "median-run" }
+          {
+            "maxNumericValue": 1800,
+            "aggregationMethod": "median-run"
+          }
         ],
         "cumulative-layout-shift": [
           "error",
-          { "maxNumericValue": 0.02, "aggregationMethod": "median-run" }
+          {
+            "maxNumericValue": 0.02,
+            "aggregationMethod": "median-run"
+          }
         ],
         "total-blocking-time": [
           "error",
-          { "maxNumericValue": 50, "aggregationMethod": "median-run" }
+          {
+            "maxNumericValue": 50,
+            "aggregationMethod": "median-run"
+          }
         ],
         "resource-summary:script:size": [
           "error",
-          { "maxNumericValue": 5120, "aggregationMethod": "median-run" }
+          {
+            "maxNumericValue": 5120,
+            "aggregationMethod": "median-run"
+          }
         ]
       }
     },

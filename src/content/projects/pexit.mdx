@@ -11,8 +11,35 @@ facts:
 contribution: I built the authentication rebuild, the Neo4j social graph and the posts and feed module, end to end from schema to React UI.
 outcome: Companies, Profiles, Listings and Posts migrated to a multi-bucket asset service, with every backend module documented in OpenAPI and covered by unit and real-Postgres integration tests.
 publicationApproved: true
+# Needs Updot's written OK before this page can be published (DESIGN.md §8.2).
 caseStudyApproved: false
+# Placeholder case study text written for layout review.
+placeholderContent: true
 tags: [Fastify, PostgreSQL, Neo4j, Redis, React]
 ---
 
-{/* Case study arrives in M4, once Updot approves publishing it (DESIGN.md §8.2). */}
+## Problem
+
+Pexit is a professional networking platform for companies, people and listings. As usage grew, three parts of the early backend were holding it back. Authentication used a single long-lived token that could not be revoked. Connection features such as mutual connections and "people you may know" were becoming slow, hard-to-maintain recursive queries. And all uploaded files shared one storage bucket with one set of rules.
+
+## What I built
+
+- **Authentication, end to end.** Short-lived access tokens and rotating refresh tokens bound to server-side sessions in Redis, encrypted with AES-256-GCM. OTP attempts and the API as a whole are rate limited through Redis.
+- **The Circle social-graph module.** Connections live in Neo4j and are queried with the Cypher query builder, which powers connection lists, mutual-connection lookups and recommendation candidates.
+- **Posts, comments and the feed.** A Fastify and PostgreSQL module with visibility rules, feeds that respect blocking, media attachments and HTML sanitisation, plus the React feed, composer, comments and repost UI.
+- **A multi-bucket asset service.** Uploads are split into buckets by asset type with their own access rules on Supabase Storage. Companies, Profiles, Listings and Posts were migrated onto it.
+
+## Key decisions
+
+**Revocable sessions over stateless tokens.** Binding refresh tokens to Redis sessions costs a lookup on refresh, but it means a user can sign out everywhere and a stolen token can be cut off immediately. Access tokens stay short-lived and stateless, so normal requests don't hit Redis.
+
+**Neo4j for the graph, PostgreSQL as the source of truth.** Graph traversals like mutual connections are natural in Cypher and awkward in SQL. PostgreSQL still owns the core records; Neo4j holds the relationships the graph features need.
+
+**Integration tests against a real PostgreSQL.** Mocked database tests kept passing while real queries broke. Module tests now run against a disposable Postgres, and pre-commit and pre-push hooks run them before anything reaches review.
+
+## Results
+
+- Users can now sign out of every device, and sessions can be revoked server-side.
+- Connection, mutual-connection and recommendation features are served from the graph module.
+- Companies, Profiles, Listings and Posts all use the new asset service.
+- Every backend module is documented in OpenAPI and covered by unit and integration tests.
