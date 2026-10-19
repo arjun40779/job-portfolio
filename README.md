@@ -2,7 +2,7 @@
 
 Personal portfolio site for job hunting. It shows projects, experience and skills. Built with Astro and Tailwind CSS, and deployed to `arjun.buzz`.
 
-**Status:** M1 (scaffold). See [`docs/DESIGN.md`](docs/DESIGN.md) for the stack, information architecture, visual design, content contract and launch checks.
+**Status:** M2 (design system). The component preview lives at `/styleguide`. See [`docs/DESIGN.md`](docs/DESIGN.md) for the stack, information architecture, visual design, content contract and launch checks.
 
 ## Development
 
@@ -20,6 +20,7 @@ pnpm dev            # http://localhost:4321
 | `pnpm check`                        | Astro and TypeScript type checks                                       |
 | `pnpm lint`                         | ESLint                                                                 |
 | `pnpm format` / `pnpm format:check` | Prettier                                                               |
+| `pnpm test:unit`                    | Vitest unit tests, including the colour contrast checks                |
 | `pnpm test:e2e`                     | Playwright tests against the production build (run `pnpm build` first) |
 | `pnpm lhci`                         | Lighthouse CI budgets against the production build (docs/DESIGN.md §7) |
 
