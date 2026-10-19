@@ -1,34 +1,23 @@
 ---
-import Button from "../components/Button.astro";
-import Container from "../components/Container.astro";
+import About from "../components/sections/About.astro";
+import Contact from "../components/sections/Contact.astro";
+import Experience from "../components/sections/Experience.astro";
+import FeaturedWork from "../components/sections/FeaturedWork.astro";
+import Hero from "../components/sections/Hero.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { site } from "../lib/site";
-
-// Placeholder until the real home sections land in M3.
 ---
 
+<!-- Evidence first, then context (docs/DESIGN.md §3). -->
 <BaseLayout>
-  <Container class="py-24">
-    <p class="mb-4 flex items-center gap-2 text-meta text-text">
-      <span class="size-2 rounded-full bg-success" aria-hidden="true"></span>
-      Open to work
-    </p>
-    <h1 class="text-display">{site.name}</h1>
-    <p class="mt-4 max-w-[34ch] text-statement text-text-muted">
-      Full-stack engineer building production web applications.
-    </p>
-    <p class="mt-6 max-w-[68ch] text-text-muted">
-      This site is being built. In the meantime, reach me by email or find my
-      work on GitHub.
-    </p>
-    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-      <Button href={`mailto:${site.email}`}>Email me</Button>
-      <Button variant="text" href={site.socials.github}>
-        GitHub
-      </Button>
-      <Button variant="text" href={site.socials.linkedin}>
-        LinkedIn
-      </Button>
-    </div>
-  </Container>
+  <Hero />
+  <FeaturedWork />
+  <Experience />
+  <About />
+  <Contact />
 </BaseLayout>
+
+<script>
+  import { initReveal } from "../scripts/reveal";
+
+  initReveal();
+</script>

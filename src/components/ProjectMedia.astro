@@ -1,0 +1,48 @@
+---
+import { Picture } from "astro:assets";
+import type { Project } from "../lib/content";
+
+interface Props {
+  project: Project;
+  /** Round the corners when the media stands alone (not inside a card). */
+  rounded?: boolean;
+  sizes?: string;
+  eager?: boolean;
+  class?: string;
+}
+
+const {
+  project,
+  rounded = false,
+  sizes = "(min-width: 980px) 560px, 100vw",
+  eager = false,
+  class: className,
+} = Astro.props;
+---
+
+{project.cover && project.coverAlt ? (
+  <Picture
+    src={project.cover}
+    alt={project.coverAlt}
+    formats={["avif", "webp"]}
+    widths={[480, 800, 1200]}
+    sizes={sizes}
+    loading={eager ? "eager" : "lazy"}
+    class:list={[
+      "aspect-16/10 w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100",
+      rounded && "rounded-card",
+      className,
+    ]}
+  />
+) : (
+  // Placeholder until real screenshots arrive (M5). Inside a card it is inset
+  // so the card's own shape stays visible on a --surface band.
+  <div class:list={[!rounded && "p-3 pb-0", className]}>
+    <div class="grid aspect-16/10 w-full place-items-center rounded-xl border border-dashed border-control-border bg-surface p-6 text-center">
+      <div>
+        <p class="text-h3 text-text-muted">{project.title}</p>
+        <p class="mt-1 text-meta text-text-muted">Screenshot coming soon</p>
+      </div>
+    </div>
+  </div>
+)}

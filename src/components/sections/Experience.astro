@@ -1,0 +1,80 @@
+---
+import { getSiteContent } from "../../lib/content";
+import { formatYearMonth } from "../../lib/format";
+import Container from "../Container.astro";
+import SectionHeading from "../SectionHeading.astro";
+import Tag from "../Tag.astro";
+
+const { experience, profile } = await getSiteContent();
+---
+
+<section
+  id="experience"
+  aria-labelledby="experience-heading"
+  class="py-16 md:py-24"
+>
+  <Container>
+    <SectionHeading id="experience-heading" eyebrow="Experience">
+      Where I've worked
+    </SectionHeading>
+
+    <ol class="ml-1 border-l border-divider">
+      {experience.map((role) => (
+        <li
+          id={`experience-${role.id}`}
+          data-reveal
+          class="relative pb-12 pl-8 last:pb-0"
+        >
+          <span
+            class="absolute top-2.5 -left-[5.5px] size-2.5 rounded-full bg-text"
+            aria-hidden="true"
+          />
+          <div class="flex flex-col gap-1 md:flex-row md:items-baseline md:justify-between md:gap-6">
+            <h3 class="text-h3">{role.role}</h3>
+            <p class="shrink-0 font-mono text-meta text-text-muted">
+              <time datetime={role.start}>{formatYearMonth(role.start)}</time> –{" "}
+              {role.end ? (
+                <time datetime={role.end}>{formatYearMonth(role.end)}</time>
+              ) : (
+                "Present"
+              )}
+            </p>
+          </div>
+          <p class="mt-1 text-text-muted">
+            {[role.company, role.product, role.location]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+          <ul class="mt-4 list-disc space-y-2 pl-5 marker:text-text-muted">
+            {role.bullets.map((bullet) => (
+              <li>{bullet}</li>
+            ))}
+          </ul>
+          <ul class="mt-4 flex flex-wrap gap-2" aria-label="Technologies">
+            {role.tech.map((tech) => (
+              <li>
+                <Tag>{tech}</Tag>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ol>
+
+    <div data-reveal class="mt-16">
+      <h3 class="text-h3">Education</h3>
+      <ul class="mt-4 space-y-3">
+        {profile.education.map((item) => (
+          <li>
+            <span class="font-medium">{item.title}</span>, {item.institution}
+            <span class="text-text-muted">
+              {" "}
+              · {item.dates}
+              {item.detail && ` · ${item.detail}`}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Container>
+</section>

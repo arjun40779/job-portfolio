@@ -1,0 +1,38 @@
+{
+  "main": {
+    "name": "Arjun Singh",
+    "title": "Full-Stack Software Engineer",
+    "statement": "Full-stack engineer building production web applications.",
+    "subline": "From Fastify APIs and PostgreSQL to React interfaces.",
+    "description": "Arjun Singh, full-stack engineer building production web applications, from Fastify APIs and PostgreSQL to React interfaces.",
+    "location": "India · Open to relocation / remote",
+    "experienceSummary": "2+ years shipping production systems",
+    "email": "arjun40779@gmail.com",
+    "openToWork": true,
+    "socials": {
+      "github": "https://github.com/arjun40779",
+      "linkedin": "https://www.linkedin.com/in/arjun-singh-541554117"
+    },
+    "resume": {
+      "path": "/resume.pdf",
+      "published": false
+    },
+    "about": "I like owning a feature completely, from the database schema and the API to the tests and the interface people actually use. Lately that has meant authentication, social graphs and feeds on Fastify, PostgreSQL, Neo4j and Redis. Before that I built CMS-driven frontends for enterprise teams on Sitecore, Contentful and Sanity.",
+    "education": [
+      {
+        "id": "gauhati-bsc",
+        "title": "B.Sc. Computer Science",
+        "institution": "Gauhati University",
+        "dates": "2020",
+        "detail": "CGPA 8.9/10"
+      },
+      {
+        "id": "coding-ninjas",
+        "title": "Full-Stack Development Program",
+        "institution": "Coding Ninjas",
+        "dates": "2026 – present",
+        "detail": "Java, Spring Boot, DevOps"
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+---
+import { getSiteContent } from "../../lib/content";
+import Container from "../Container.astro";
+import CopyEmail from "../CopyEmail.astro";
+import ExternalLink from "../ExternalLink.astro";
+
+const { profile } = await getSiteContent();
+---
+
+<section
+  id="contact"
+  aria-labelledby="contact-heading"
+  class="bg-surface py-16 md:py-24"
+>
+  <Container>
+    <h2 id="contact-heading" class="text-h2">
+      Let's work together.
+    </h2>
+    <p class="mt-4 max-w-[52ch] text-text-muted">
+      I'm open to new full-stack roles in India, with relocation, or remote.
+      Email is the fastest way to reach me.
+    </p>
+    <div class="mt-8 flex flex-col gap-3">
+      <a
+        href={`mailto:${profile.email}`}
+        class="self-start text-statement break-all text-link hover:text-link-hover hover:underline"
+      >
+        {profile.email}
+      </a>
+      <CopyEmail email={profile.email} />
+    </div>
+    <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-meta">
+      <li>
+        <ExternalLink href={profile.socials.github}>GitHub</ExternalLink>
+      </li>
+      <li>
+        <ExternalLink href={profile.socials.linkedin}>LinkedIn</ExternalLink>
+      </li>
+    </ul>
+  </Container>
+</section>
