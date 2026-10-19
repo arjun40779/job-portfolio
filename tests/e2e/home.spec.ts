@@ -27,7 +27,7 @@ test.describe("home page", () => {
     const cards = page.locator("#work article");
     await expect(cards.getByRole("heading", { level: 3 })).toHaveText([
       "Pexit",
-      "PGSinKokrajhar",
+      "PG in Kokrajhar",
       "HorizonVision Group",
     ]);
     for (const card of await cards.all()) {
