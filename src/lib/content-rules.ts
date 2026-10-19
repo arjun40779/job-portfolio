@@ -33,6 +33,26 @@ export function visibleProjects<T extends ProjectLike>(
   return showDrafts ? projects : projects.filter((p) => p.publicationApproved);
 }
 
+export interface CaseStudyLike {
+  featuredRank?: number | undefined;
+  caseStudyApproved: boolean;
+  placeholderContent: boolean;
+}
+
+/**
+ * A featured project gets a case study page in production only when the page
+ * is approved and its text is real. Draft builds show every featured one.
+ */
+export function hasCaseStudyPage(
+  project: CaseStudyLike,
+  showDrafts: boolean,
+): boolean {
+  if (project.featuredRank === undefined) return false;
+  return (
+    showDrafts || (project.caseStudyApproved && !project.placeholderContent)
+  );
+}
+
 /** Newest role first, regardless of order in the JSON file. */
 export function sortExperience<T extends ExperienceLike>(items: T[]): T[] {
   return [...items].sort((a, b) => b.start.localeCompare(a.start));
