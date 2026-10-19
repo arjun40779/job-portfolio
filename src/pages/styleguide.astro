@@ -1,0 +1,246 @@
+---
+import Button from "../components/Button.astro";
+import Card from "../components/Card.astro";
+import Container from "../components/Container.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import Tag from "../components/Tag.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { contrastRatio } from "../lib/contrast";
+import { contrastPairs, parseThemeTokens, type TokenMap } from "../lib/tokens";
+import globalCss from "../styles/global.css?raw";
+
+// Component preview for design review (M2). Not linked from the site and
+// kept out of search results.
+
+const tokens = parseThemeTokens(globalCss);
+const themes: { name: string; values: TokenMap }[] = [
+  { name: "Light", values: tokens.light },
+  { name: "Dark", values: tokens.darkExplicit },
+];
+
+function rows(values: TokenMap) {
+  return contrastPairs.map((pair) => {
+    const fg = values[pair.fg] ?? "";
+    const bg = values[pair.bg] ?? "";
+    const ratio = contrastRatio(fg, bg);
+    return { ...pair, fgHex: fg, bgHex: bg, ratio, pass: ratio >= pair.min };
+  });
+}
+
+const typeScale = [
+  { cls: "text-display", label: "Display · 44 → 72px / 600" },
+  { cls: "text-statement", label: "Statement · 22 → 28px / 500" },
+  { cls: "text-h2", label: "H2 · 32 → 44px / 600" },
+  { cls: "text-h3-lg", label: "H3 large · 24 → 28px / 600" },
+  { cls: "text-h3", label: "H3 · 19 → 24px / 600" },
+  { cls: "text-body", label: "Body · 17px / 400" },
+  { cls: "text-meta", label: "Meta · 14px / 400" },
+];
+---
+
+<BaseLayout
+  title="Styleguide"
+  description="Design tokens and components."
+  noindex
+>
+  <Container class="py-16">
+    <h1 class="text-display">Styleguide</h1>
+    <p class="mt-4 max-w-[68ch] text-text-muted">
+      Tokens and components from{" "}
+      <code class="font-mono text-meta">docs/DESIGN.md</code> §4. Use the theme
+      toggle in the header to preview both themes.
+    </p>
+  </Container>
+
+  <section aria-labelledby="sg-colour" class="border-t border-divider py-16">
+    <Container>
+      <SectionHeading id="sg-colour" eyebrow="Tokens">
+        Colour
+      </SectionHeading>
+      {themes.map(({ name, values }) => (
+        <div class="mb-14">
+          <h3 class="mb-6 text-h3">{name} theme</h3>
+          <ul class="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {Object.entries(values).map(([token, hex]) => (
+              <li>
+                <span
+                  class="block h-14 rounded-xl border border-divider"
+                  style={`background-color: ${hex}`}
+                  aria-hidden="true"
+                />
+                <span class="mt-2 block text-meta font-medium">--{token}</span>
+                <span class="block font-mono text-tag text-text-muted">
+                  {hex}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div
+            class="overflow-x-auto"
+            tabindex="0"
+            role="region"
+            aria-label={`${name} theme contrast checks`}
+          >
+            <table class="w-full min-w-[560px] text-left text-meta">
+              <caption class="mb-3 text-left text-text-muted">
+                {name} theme: contrast checks (WCAG 2.x)
+              </caption>
+              <thead>
+                <tr class="border-b border-divider">
+                  <th scope="col" class="py-2 pr-4 font-semibold">
+                    Sample
+                  </th>
+                  <th scope="col" class="py-2 pr-4 font-semibold">
+                    Pair
+                  </th>
+                  <th scope="col" class="py-2 pr-4 font-semibold">
+                    Use
+                  </th>
+                  <th scope="col" class="py-2 pr-4 font-semibold">
+                    Ratio
+                  </th>
+                  <th scope="col" class="py-2 font-semibold">
+                    Result
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows(values).map((row) => (
+                  <tr class="border-b border-divider">
+                    <td class="py-2 pr-4">
+                      {row.min >= 4.5 ? (
+                        <span
+                          class="inline-grid size-9 place-items-center rounded-lg font-semibold"
+                          style={`color: ${row.fgHex}; background-color: ${row.bgHex}`}
+                          aria-hidden="true"
+                        >
+                          Aa
+                        </span>
+                      ) : (
+                        // Non-text pairs (boundaries, focus, status) are shown as a shape.
+                        <span
+                          class="inline-grid size-9 place-items-center rounded-lg"
+                          style={`background-color: ${row.bgHex}`}
+                          aria-hidden="true"
+                        >
+                          <span
+                            class="block size-5 rounded-full border-2"
+                            style={`border-color: ${row.fgHex}`}
+                          />
+                        </span>
+                      )}
+                    </td>
+                    <td class="py-2 pr-4 font-mono text-tag">
+                      --{row.fg} on --{row.bg}
+                    </td>
+                    <td class="py-2 pr-4 text-text-muted">{row.use}</td>
+                    <td class="py-2 pr-4 font-mono">
+                      {row.ratio.toFixed(2)} (≥ {row.min})
+                    </td>
+                    <td class="py-2">{row.pass ? "Pass" : "Fail"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
+    </Container>
+  </section>
+
+  <section aria-labelledby="sg-type" class="border-t border-divider py-16">
+    <Container>
+      <SectionHeading id="sg-type" eyebrow="Tokens">
+        Typography
+      </SectionHeading>
+      <ul class="space-y-8">
+        {typeScale.map(({ cls, label }) => (
+          <li>
+            <p class="mb-1 font-mono text-tag text-text-muted">{label}</p>
+            <p class={cls}>Full-stack engineer</p>
+          </li>
+        ))}
+        <li>
+          <p class="mb-1 font-mono text-tag text-text-muted">
+            Tag · 12px mono / 500
+          </p>
+          <p class="font-mono text-tag">FASTIFY · POSTGRESQL · NEO4J</p>
+        </li>
+      </ul>
+    </Container>
+  </section>
+
+  <section aria-labelledby="sg-buttons" class="border-t border-divider py-16">
+    <Container>
+      <SectionHeading id="sg-buttons" eyebrow="Components">
+        Buttons and links
+      </SectionHeading>
+      <div class="flex flex-wrap items-center gap-4">
+        <Button href="#sg-buttons">View my work</Button>
+        <Button href="#sg-buttons" size="sm">
+          Résumé
+        </Button>
+        <Button variant="outlined" href="#sg-buttons">
+          Outlined
+        </Button>
+        <Button variant="text" href="#sg-buttons">
+          Read case study
+        </Button>
+        <Button variant="outlined" data-sample="button">
+          Button element
+        </Button>
+      </div>
+      <p class="mt-6 max-w-[68ch]">
+        Inline text links look <a href="#sg-buttons">like this</a>; hover adds
+        an underline.
+      </p>
+    </Container>
+  </section>
+
+  <section aria-labelledby="sg-tags" class="border-t border-divider py-16">
+    <Container>
+      <SectionHeading id="sg-tags" eyebrow="Components">
+        Tags
+      </SectionHeading>
+      <div class="flex flex-wrap gap-2">
+        <Tag>Fastify</Tag>
+        <Tag>PostgreSQL</Tag>
+        <Tag>Neo4j</Tag>
+        <Tag>Redis</Tag>
+        <Tag>React</Tag>
+      </div>
+    </Container>
+  </section>
+
+  <section aria-labelledby="sg-cards" class="bg-surface py-16">
+    <Container>
+      <SectionHeading id="sg-cards" eyebrow="Components">
+        Cards on a surface band
+      </SectionHeading>
+      <ul class="grid gap-6 md:grid-cols-2">
+        <Card as="li" tone="bg" interactive>
+          <div class="aspect-16/10 bg-divider/40" aria-hidden="true"></div>
+          <div class="p-6">
+            <h3 class="text-h3">Interactive card</h3>
+            <p class="mt-2 text-text-muted">
+              Lifts with a soft shadow on hover.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <Tag>Astro</Tag>
+              <Tag>Tailwind</Tag>
+            </div>
+            <Button variant="text" href="#sg-cards" class="mt-4">
+              Case study
+            </Button>
+          </div>
+        </Card>
+        <Card as="li" tone="bg">
+          <div class="p-6">
+            <h3 class="text-h3">Static card</h3>
+            <p class="mt-2 text-text-muted">Flat, with no hover effect.</p>
+          </div>
+        </Card>
+      </ul>
+    </Container>
+  </section>
+</BaseLayout>

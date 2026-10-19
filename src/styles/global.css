@@ -1,6 +1,34 @@
 @import "tailwindcss";
 
 /*
+ * Inter for non-Apple devices (docs/DESIGN.md §7.3). Apple devices resolve
+ * -apple-system first, so this face is never used, and never downloaded,
+ * there. It is not preloaded on purpose. Latin subset only.
+ */
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("@fontsource-variable/inter/files/inter-latin-wght-normal.woff2")
+    format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+/* Arial adjusted to Inter's metrics, so the swap barely shifts layout. */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  size-adjust: 107.4%;
+  ascent-override: 90.2%;
+  descent-override: 22.48%;
+  line-gap-override: 0%;
+}
+
+/*
  * Design tokens (docs/DESIGN.md §4.3). Contrast ratios are listed there.
  * Light values live on :root; dark values apply when the OS prefers dark
  * (unless the visitor picked light) or when data-theme="dark" is set.
@@ -82,9 +110,44 @@
 @theme {
   --font-sans:
     -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-    "Inter Variable", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    "Inter Variable", "Inter Fallback", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --radius-card: 18px;
+
+  /* Type scale (§4.4). Fluid sizes run from 320px to 980px viewports. */
+  --text-display: clamp(2.75rem, 1.901rem + 4.242vw, 4.5rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.015em;
+  --text-display--font-weight: 600;
+
+  --text-statement: clamp(1.375rem, 1.193rem + 0.909vw, 1.75rem);
+  --text-statement--line-height: 1.25;
+  --text-statement--letter-spacing: -0.01em;
+  --text-statement--font-weight: 500;
+
+  --text-h2: clamp(2rem, 1.636rem + 1.818vw, 2.75rem);
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.01em;
+  --text-h2--font-weight: 600;
+
+  --text-h3: clamp(1.1875rem, 1.036rem + 0.758vw, 1.5rem);
+  --text-h3--line-height: 1.25;
+  --text-h3--font-weight: 600;
+
+  --text-h3-lg: clamp(1.5rem, 1.379rem + 0.606vw, 1.75rem);
+  --text-h3-lg--line-height: 1.2;
+  --text-h3-lg--font-weight: 600;
+
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.5;
+
+  --text-meta: 0.875rem;
+  --text-meta--line-height: 1.43;
+
+  --text-tag: 0.75rem;
+  --text-tag--line-height: 1;
+  --text-tag--font-weight: 500;
 }
 
 @view-transition {
@@ -104,8 +167,24 @@
   body {
     min-height: 100dvh;
     background-color: var(--bg);
-    font-size: 17px;
-    line-height: 1.5;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+
+  /* Sticky header height including its 1px border: two rows on mobile, one from md up. */
+  :root {
+    --header-h: calc(5.75rem + 1px);
+  }
+
+  @media (width >= 48rem) {
+    :root {
+      --header-h: calc(3.25rem + 1px);
+    }
+  }
+
+  /* Anchored sections land with their heading below the sticky header (§4.8). */
+  [id] {
+    scroll-margin-top: calc(var(--header-h) + 16px);
   }
 
   a {
@@ -116,6 +195,16 @@
   a:hover {
     color: var(--link-hover);
     text-decoration-line: underline;
+  }
+
+  /*
+   * Links inside running text are underlined so they don't rely on colour
+   * alone (WCAG 1.4.1). Standalone links and buttons carry classes and keep
+   * the Apple-style no-underline look.
+   */
+  p a:not([class]) {
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
   }
 
   :focus-visible {

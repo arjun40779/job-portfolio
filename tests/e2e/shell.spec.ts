@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const routes = ["/", "/404"];
+const routes = ["/", "/404", "/styleguide"];
 
 test.describe("site shell", () => {
   test("home page renders its heading and metadata", async ({ page }) => {
@@ -25,6 +25,14 @@ test.describe("site shell", () => {
     expect(response?.status()).toBe(404);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "Page not found",
+    );
+  });
+
+  test("styleguide is kept out of search results", async ({ page }) => {
+    await page.goto("/styleguide");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+      "content",
+      "noindex",
     );
   });
 
@@ -68,9 +76,12 @@ test.describe("site shell", () => {
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("content is visible", async ({ page }) => {
+  test("content is visible and the theme toggle is hidden", async ({
+    page,
+  }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.locator("[data-theme-toggle]")).toBeHidden();
     await expect(page.getByRole("link", { name: "Email me" })).toHaveAttribute(
       "href",
       "mailto:arjun40779@gmail.com",

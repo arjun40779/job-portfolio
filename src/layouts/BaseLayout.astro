@@ -1,20 +1,21 @@
 ---
 import "../styles/global.css";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import { site } from "../lib/site";
 
 interface Props {
   title?: string;
   description?: string;
+  /** Keep the page out of search results (e.g. the styleguide). */
+  noindex?: boolean;
 }
 
-const siteName = "Arjun Singh";
-const {
-  title,
-  description = "Arjun Singh, full-stack engineer building production web applications, from Fastify APIs and PostgreSQL to React interfaces.",
-} = Astro.props;
+const { title, description = site.description, noindex = false } = Astro.props;
 
 const pageTitle = title
-  ? `${title} · ${siteName}`
-  : `${siteName} · Full-Stack Software Engineer`;
+  ? `${title} · ${site.name}`
+  : `${site.name} · ${site.title}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -22,9 +23,26 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <!--
+      Runs before first paint: marks JS as available and applies a stored
+      theme choice so there is no flash of the wrong theme.
+    -->
+    <script is:inline>
+      (function () {
+        const root = document.documentElement;
+        root.classList.add("js");
+        try {
+          const theme = localStorage.getItem("theme");
+          if (theme === "light" || theme === "dark") root.dataset.theme = theme;
+        } catch {
+          // Storage blocked: follow the OS setting.
+        }
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta
@@ -38,19 +56,23 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       media="(prefers-color-scheme: dark)"
     />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={siteName} />
+    <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta name="generator" content={Astro.generator} />
   </head>
-  <body>
+  <body class="flex flex-col">
     <a
       href="#main"
       class="sr-only rounded-full bg-btn-primary px-4 py-2 text-btn-primary-fg focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50"
     >
       Skip to content
     </a>
-    <slot />
+    <Header />
+    <main id="main" tabindex="-1" class="flex-1 outline-none">
+      <slot />
+    </main>
+    <Footer />
   </body>
 </html>
