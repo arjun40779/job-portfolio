@@ -19,6 +19,7 @@
 | 3.3 | **M5 build notes:** real PGSinKokrajhar screenshot; Pexit architecture diagram; separate `coverApproved` and `diagramApproved` gates for employer media (§5.6, §8.2); images optimised to AVIF/WebP by sharp |
 | 3.4 | **M6 build notes:** Open Graph images generated at build; `ProfilePage` JSON-LD; hash-based CSP via Astro `security.csp`; `vercel.json` security and cache headers; `pnpm launch:check` reports open publication gates (§8.2, §8.4) |
 | 3.5 | **Launch decisions:** case studies rewritten from the résumé and the live sites only (no invented detail); client names approved; claims launched with fallback wording; résumé link stays on LinkedIn until a web PDF is supplied; Pexit case study, diagram and screenshot stay draft until Updot permits; production cards without approved media drop the media slot |
+| 3.6 | **Post-launch:** web résumé published at `/resume.pdf` with the phone number redacted (text removed from the PDF, not covered); project renamed "PG in Kokrajhar" to match its live site; `<meta name="author">` added for link previews |
 
 ---
 

@@ -41,7 +41,7 @@ test.describe("project media", () => {
     await expect(img).toHaveAttribute("fetchpriority", "high");
   });
 
-  test("the PGSinKokrajhar card shows its screenshot", async ({ page }) => {
+  test("the PG in Kokrajhar card shows its screenshot", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("#project-pginkokrajhar img")).toHaveAttribute(
       "alt",

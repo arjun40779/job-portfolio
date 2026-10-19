@@ -4,7 +4,7 @@ export const drafts = process.env.SHOW_DRAFTS === "true";
 /** Featured case studies in rank order; `live` ones are published in production. */
 export const allCaseStudies = [
   { slug: "pexit", title: "Pexit", live: false },
-  { slug: "pginkokrajhar", title: "PGSinKokrajhar", live: true },
+  { slug: "pginkokrajhar", title: "PG in Kokrajhar", live: true },
   { slug: "horizonvision-group", title: "HorizonVision Group", live: true },
 ] as const;
 
