@@ -1,0 +1,21 @@
+---
+interface Props {
+  /** Heading id, used by the section's aria-labelledby. */
+  id: string;
+  eyebrow?: string;
+  level?: 2 | 3;
+  class?: string;
+}
+
+const { id, eyebrow, level = 2, class: className } = Astro.props;
+const Heading = `h${level}` as const;
+---
+
+<div class:list={["mb-10 md:mb-12", className]}>
+  {eyebrow && (
+    <p class="mb-2 text-meta font-semibold text-text-muted">{eyebrow}</p>
+  )}
+  <Heading id={id} class={level === 2 ? "text-h2" : "text-h3"}>
+    <slot />
+  </Heading>
+</div>

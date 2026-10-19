@@ -1,0 +1,60 @@
+---
+import { isExternal } from "../lib/site";
+
+interface Props {
+  variant?: "filled" | "outlined" | "text";
+  size?: "sm" | "md";
+  href?: string;
+  type?: "button" | "submit";
+  class?: string;
+  [key: `data-${string}` | `aria-${string}`]: string | undefined;
+}
+
+const {
+  variant = "filled",
+  size = "md",
+  href,
+  type = "button",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const sizes = {
+  sm: "px-3.5 py-1.5 text-meta",
+  md: "px-5 py-2.5 text-[15px]/5",
+};
+
+const variants = {
+  filled:
+    "rounded-full bg-btn-primary font-medium text-btn-primary-fg hover:bg-btn-primary-hover hover:text-btn-primary-fg active:bg-btn-primary-active",
+  outlined:
+    "rounded-full border border-control-border font-medium text-text hover:border-text hover:text-text",
+  text: "text-link hover:text-link-hover hover:underline",
+};
+
+const classes = [
+  "inline-flex items-center justify-center gap-1 no-underline transition-colors duration-200 motion-reduce:transition-none hover:no-underline",
+  variant !== "text" && sizes[size],
+  variants[variant],
+  className,
+];
+
+const external = href ? isExternal(href) : false;
+---
+
+{href ? (
+  <a
+    href={href}
+    class:list={classes}
+    rel={external ? "noopener noreferrer" : undefined}
+    {...rest}
+  >
+    <slot />
+    {variant === "text" && <span aria-hidden="true">›</span>}
+  </a>
+) : (
+  <button type={type} class:list={[classes, "cursor-pointer"]} {...rest}>
+    <slot />
+    {variant === "text" && <span aria-hidden="true">›</span>}
+  </button>
+)}

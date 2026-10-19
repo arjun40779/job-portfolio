@@ -1,0 +1,37 @@
+---
+import { resumeHref, site } from "../lib/site";
+import Container from "./Container.astro";
+import ExternalLink from "./ExternalLink.astro";
+---
+
+<footer class="border-t border-divider">
+  <Container class="py-10 text-meta text-text-muted">
+    <ul class="flex flex-wrap gap-x-6 gap-y-2">
+      <li>
+        <a href={`mailto:${site.email}`}>{site.email}</a>
+      </li>
+      <li>
+        <ExternalLink href={site.socials.github}>GitHub</ExternalLink>
+      </li>
+      <li>
+        <ExternalLink href={site.socials.linkedin}>LinkedIn</ExternalLink>
+      </li>
+      <li>
+        {site.resume.published ? (
+          <a href={resumeHref}>Résumé</a>
+        ) : (
+          <ExternalLink href={resumeHref}>Résumé</ExternalLink>
+        )}
+      </li>
+    </ul>
+    <p class="mt-4">
+      © {new Date().getFullYear()}
+      {site.name} · Built with Astro
+      {site.sourceUrl && (
+        <>
+          · <ExternalLink href={site.sourceUrl}>Source</ExternalLink>
+        </>
+      )}
+    </p>
+  </Container>
+</footer>

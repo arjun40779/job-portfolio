@@ -93,7 +93,7 @@ There is no separate `/projects` index page in v1. Every project is reachable fr
 
 The evidence comes first, then the context.
 
-1. **Header (sticky, translucent):** "Arjun Singh" wordmark (links to `/`), links **Work · Experience · About**, theme toggle, **Résumé** pill button.
+1. **Header (sticky, translucent):** "Arjun Singh" wordmark (links to `/`), links **Work · Experience · About**, **Résumé** pill button, theme toggle.
 2. **Hero (left-aligned):** name, value statement, CTAs **View my work** (to `#work`) and **Résumé**. GitHub, LinkedIn and email icon links. A **project screenshot** on the right (§4.2).
 3. **Featured work** `#work` (on `--surface`): **Pexit as a large card**, then **PGSinKokrajhar** and **HorizonVision Group** as two smaller cards. Each card shows a screenshot or diagram, **my contribution**, and **one concrete outcome**. Tech tags are secondary. Below the cards is a compact **Client work** list.
 4. **Experience** `#experience`: a timeline of 4 roles, each with its top 2–3 *action + result* bullets. Then Education.
@@ -136,7 +136,7 @@ Restrained and inspired by **apple.com**: generous white space, confident type, 
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│ Arjun Singh                 Work  Experience  About   ◐  ( Résumé )  │
+│ Arjun Singh                 Work  Experience  About  ( Résumé )  ◐   │
 ├──────────────────────────────────────────────────────────────────────┤
 │                                                                      │
 │  ● Open to work                       ┌──────────────────────────┐   │
@@ -266,7 +266,7 @@ Font sizes scale fluidly with `clamp()`.
 - `scroll-margin-top` equals the sticky header height plus 16px on every anchored section, so `#work`, `#experience`, `#about` and `#contact` land with the heading visible, including when arriving from another page (`/#contact`).
 - Images have `alt` text, and captions describe what the screenshot shows. Decorative icons are `aria-hidden`.
 - Copy feedback is announced through `aria-live`. The theme toggle exposes its state (`aria-pressed` or a labelled radio group).
-- Colour is never the only signal.
+- Colour is never the only signal. Links inside running text are underlined; standalone links (nav, "›" links, cards) aren't.
 
 ---
 
@@ -517,7 +517,7 @@ Each milestone is a PR with a Vercel preview link.
 - [ ] Navigating home → case study → back → another case study shows correct content, theme, and working copy button on every page (between-page navigation, not only direct loads).
 
 **Keyboard and assistive tech**
-- [ ] Tab order: skip link → header links → theme toggle → Résumé → main content. Every control has a visible focus ring.
+- [ ] Tab order: skip link → wordmark → header links → Résumé → theme toggle → main content (DOM order matches the desktop row). Every control has a visible focus ring.
 - [ ] Skip link moves focus to `<main>`.
 - [ ] The theme toggle works with Enter and Space and announces its state.
 - [ ] axe reports zero violations on all routes in light **and** dark themes.
