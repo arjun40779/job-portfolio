@@ -1,5 +1,4 @@
 import { expect, test } from "@playwright/test";
-import { drafts } from "./env";
 import { gapBelowHeader, revealAll } from "./helpers";
 
 test.describe("home page", () => {
@@ -37,29 +36,17 @@ test.describe("home page", () => {
     }
   });
 
-  test("keeps unapproved content out of the production build", async ({
+  test("shows the client work list with direct links and no Draft badges", async ({
     page,
   }) => {
-    test.skip(drafts, "production-only behaviour");
-    await page.goto("/");
-    await expect(page.getByText("Draft", { exact: true })).toHaveCount(0);
-    await expect(
-      page.getByRole("heading", { name: "Client work" }),
-    ).toHaveCount(0);
-    await expect(page.getByText("FTI Consulting")).toHaveCount(0);
-  });
-
-  test("shows unapproved client work with Draft badges in draft builds", async ({
-    page,
-  }) => {
-    test.skip(!drafts, "needs SHOW_DRAFTS=true build");
     await page.goto("/");
     await expect(
       page.locator("#work").getByRole("heading", { name: "Client work" }),
     ).toBeVisible();
     await expect(
-      page.locator("#work li").filter({ hasText: "FTI Consulting" }),
-    ).toContainText("Draft");
+      page.getByRole("link", { name: "Visit site (Altudo)" }),
+    ).toHaveAttribute("href", "https://www.altudo.co/");
+    await expect(page.getByText("Draft", { exact: true })).toHaveCount(0);
   });
 
   test("lists experience newest first", async ({ page }) => {
@@ -123,8 +110,7 @@ test.describe("anchors", () => {
     await expect(page.locator("#contact-heading")).toBeInViewport();
   });
 
-  const linkRoutes = ["/", "/404", "/styleguide"];
-  if (drafts) linkRoutes.push("/projects/pginkokrajhar/");
+  const linkRoutes = ["/", "/404", "/styleguide", "/projects/pginkokrajhar/"];
 
   for (const route of linkRoutes) {
     test(`every internal link on ${route} resolves`, async ({

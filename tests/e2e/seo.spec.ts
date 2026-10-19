@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
-import { draftCaseStudies, drafts } from "./env";
+import { caseStudies } from "./env";
 
 const routes = [
   "/",
   "/404",
   "/styleguide/",
-  ...(drafts ? draftCaseStudies.map(({ slug }) => `/projects/${slug}/`) : []),
+  ...caseStudies.map(({ slug }) => `/projects/${slug}/`),
 ];
 
 test.describe("link previews and structured data", () => {
@@ -31,7 +31,6 @@ test.describe("link previews and structured data", () => {
   }
 
   test("case studies get their own preview image", async ({ page }) => {
-    test.skip(!drafts, "needs SHOW_DRAFTS=true build");
     await page.goto("/projects/pginkokrajhar/");
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
       "content",

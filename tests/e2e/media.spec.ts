@@ -2,7 +2,11 @@ import { expect, test } from "@playwright/test";
 import { drafts } from "./env";
 import { revealAll } from "./helpers";
 
-const routes = ["/", ...(drafts ? ["/projects/pginkokrajhar/"] : [])];
+const routes = [
+  "/",
+  "/projects/pginkokrajhar/",
+  "/projects/horizonvision-group/",
+];
 
 test.describe("project media", () => {
   for (const route of routes) {
@@ -53,10 +57,23 @@ test.describe("project media", () => {
     if (drafts) {
       await expect(diagram).toBeVisible();
     } else {
+      // Production shows no diagram and no placeholder: the card is text-only.
       await expect(diagram).toHaveCount(0);
-      await expect(page.locator("#project-pexit")).toContainText(
+      await expect(page.locator("#project-pexit")).not.toContainText(
         "Image coming soon",
       );
+      await expect(
+        page.locator("#project-pexit img, #project-pexit svg[role='img']"),
+      ).toHaveCount(0);
     }
+  });
+
+  test("the HorizonVision Group card shows its screenshot", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(
+      page.locator("#project-horizonvision-group img"),
+    ).toHaveAttribute("alt", /Horizon Vision Group home page/);
   });
 });

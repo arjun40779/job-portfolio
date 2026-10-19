@@ -48,28 +48,28 @@
           "error",
           {
             "maxNumericValue": 1800,
-            "aggregationMethod": "median-run"
+            "aggregationMethod": "median"
           }
         ],
         "cumulative-layout-shift": [
           "error",
           {
             "maxNumericValue": 0.02,
-            "aggregationMethod": "median-run"
+            "aggregationMethod": "median"
           }
         ],
         "total-blocking-time": [
           "error",
           {
             "maxNumericValue": 50,
-            "aggregationMethod": "median-run"
+            "aggregationMethod": "median"
           }
         ],
         "resource-summary:script:size": [
           "error",
           {
             "maxNumericValue": 5120,
-            "aggregationMethod": "median-run"
+            "aggregationMethod": "median"
           }
         ]
       }

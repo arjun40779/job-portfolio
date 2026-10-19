@@ -13,8 +13,6 @@ outcome: Companies, Profiles, Listings and Posts migrated to a multi-bucket asse
 publicationApproved: true
 # Needs Updot's written OK before this page can be published (DESIGN.md §8.2).
 caseStudyApproved: false
-# Placeholder case study text written for layout review.
-placeholderContent: true
 diagram: pexit-architecture
 # Needs Updot's OK, like the case study; until then only draft builds show it.
 diagramApproved: false
@@ -23,26 +21,25 @@ tags: [Fastify, PostgreSQL, Neo4j, Redis, React]
 
 ## Problem
 
-Pexit is a professional networking platform for companies, people and listings. As usage grew, three parts of the early backend were holding it back. Authentication used a single long-lived token that could not be revoked. Connection features such as mutual connections and "people you may know" were becoming slow, hard-to-maintain recursive queries. And all uploaded files shared one storage bucket with one set of rules.
+Pexit is a professional networking platform for companies, profiles and listings. It needed its core backend systems, including authentication, the social graph, the feed and asset storage, built to production standards.
 
 ## What I built
 
-- **Authentication, end to end.** Short-lived access tokens and rotating refresh tokens bound to server-side sessions in Redis, encrypted with AES-256-GCM. OTP attempts and the API as a whole are rate limited through Redis.
-- **The Circle social-graph module.** Connections live in Neo4j and are queried with the Cypher query builder, which powers connection lists, mutual-connection lookups and recommendation candidates.
-- **Posts, comments and the feed.** A Fastify and PostgreSQL module with visibility rules, feeds that respect blocking, media attachments and HTML sanitisation, plus the React feed, composer, comments and repost UI.
-- **A multi-bucket asset service.** Uploads are split into buckets by asset type with their own access rules on Supabase Storage. Companies, Profiles, Listings and Posts were migrated onto it.
+- **Authentication, rebuilt end to end:** split access and refresh JWTs bound to Redis-backed sessions, AES-256-GCM token encryption, Redis-backed OTP attempt limiting and a global Redis rate limiter.
+- **The Circle social-graph module** on Neo4j with the Cypher query builder, powering connections, mutual-connection lookups and recommendation candidates.
+- **Posts, comments and the feed** on Fastify and PostgreSQL, with visibility rules, blocking-aware feeds, media attachments and HTML sanitisation, plus the React feed, composer, comments and repost UI.
+- **A multi-bucket asset service** on Supabase Storage, with Companies, Profiles, Listings and Posts migrated off the earlier single-bucket storage.
+- **The Listings module's** per-type service and data-access layers, with location, category and pagination filters, new REST endpoints and React pages.
 
 ## Key decisions
 
-**Revocable sessions over stateless tokens.** Binding refresh tokens to Redis sessions costs a lookup on refresh, but it means a user can sign out everywhere and a stolen token can be cut off immediately. Access tokens stay short-lived and stateless, so normal requests don't hit Redis.
+**Sessions bound to Redis.** Refresh tokens are tied to server-side sessions, so sessions can be revoked on the server.
 
-**Neo4j for the graph, PostgreSQL as the source of truth.** Graph traversals like mutual connections are natural in Cypher and awkward in SQL. PostgreSQL still owns the core records; Neo4j holds the relationships the graph features need.
+**A graph database for the social graph.** Connections and mutual-connection lookups run on Neo4j.
 
-**Integration tests against a real PostgreSQL.** Mocked database tests kept passing while real queries broke. Module tests now run against a disposable Postgres, and pre-commit and pre-push hooks run them before anything reaches review.
+**Tests against a real PostgreSQL.** Every module has Vitest unit tests and integration tests against a real Postgres database, plus Playwright end-to-end tests, enforced by pre-commit and pre-push hooks in the Nx and pnpm monorepo.
 
 ## Results
 
-- Users can now sign out of every device, and sessions can be revoked server-side.
-- Connection, mutual-connection and recommendation features are served from the graph module.
-- Companies, Profiles, Listings and Posts all use the new asset service.
-- Every backend module is documented in OpenAPI and covered by unit and integration tests.
+- Companies, Profiles, Listings and Posts run on the multi-bucket asset service.
+- Every backend module is documented in OpenAPI and covered by automated tests.
