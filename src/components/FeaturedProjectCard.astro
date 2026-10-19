@@ -1,0 +1,81 @@
+---
+import type { Project } from "../lib/content";
+import Card from "./Card.astro";
+import ExternalLink from "./ExternalLink.astro";
+import ProjectMedia from "./ProjectMedia.astro";
+import Tag from "./Tag.astro";
+
+interface Props {
+  project: Project;
+  size?: "lg" | "md";
+  class?: string;
+}
+
+const { project, size = "md", class: className } = Astro.props;
+const large = size === "lg";
+const titleId = `project-${project.id}-title`;
+---
+
+<Card
+  as="article"
+  tone="bg"
+  id={`project-${project.id}`}
+  aria-labelledby={titleId}
+  class:list={[
+    "flex w-full flex-col",
+    large && "md:grid md:grid-cols-12",
+    className,
+  ]}
+>
+  <div class:list={[large && "md:col-span-7"]}>
+    <ProjectMedia
+      project={project}
+      class={large ? "md:pb-3" : undefined}
+      sizes={
+        large
+          ? "(min-width: 980px) 572px, 100vw"
+          : "(min-width: 768px) 470px, 100vw"
+      }
+    />
+  </div>
+  <div
+    class:list={["flex flex-1 flex-col p-6 md:p-8", large && "md:col-span-5"]}
+  >
+    {project.draft && <Tag class="mb-3 self-start">Draft</Tag>}
+    <h3 id={titleId} class={large ? "text-h3-lg" : "text-h3"}>
+      {project.title}
+    </h3>
+    <p class="mt-2 text-text-muted">{project.summary}</p>
+    <dl class="mt-5 space-y-3 text-meta">
+      <div>
+        <dt class="font-semibold">What I built</dt>
+        <dd class="mt-0.5">{project.contribution}</dd>
+      </div>
+      <div>
+        <dt class="font-semibold">Outcome</dt>
+        <dd class="mt-0.5">{project.outcome}</dd>
+      </div>
+    </dl>
+    <ul class="mt-5 flex flex-wrap gap-2" aria-label="Technologies">
+      {project.tags.map((tag) => (
+        <li>
+          <Tag>{tag}</Tag>
+        </li>
+      ))}
+    </ul>
+    {(project.live || project.code) && (
+      <div class="mt-auto flex flex-wrap gap-x-6 pt-6 text-meta">
+        {project.live && (
+          <ExternalLink href={project.live}>
+            Visit site<span class="sr-only"> ({project.title})</span>
+          </ExternalLink>
+        )}
+        {project.code && (
+          <ExternalLink href={project.code}>
+            Code<span class="sr-only"> ({project.title})</span>
+          </ExternalLink>
+        )}
+      </div>
+    )}
+  </div>
+</Card>
