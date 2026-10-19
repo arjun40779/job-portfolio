@@ -1,35 +1,38 @@
 ---
-import { resumeHref, site } from "../lib/site";
+import { getSiteContent } from "../lib/content";
+import { resumeHref, sourceUrl } from "../lib/site";
 import Container from "./Container.astro";
 import ExternalLink from "./ExternalLink.astro";
+
+const { profile } = await getSiteContent();
+const resume = resumeHref(profile);
 ---
 
 <footer class="border-t border-divider">
   <Container class="py-10 text-meta text-text-muted">
     <ul class="flex flex-wrap gap-x-6 gap-y-2">
       <li>
-        <a href={`mailto:${site.email}`}>{site.email}</a>
+        <a href={`mailto:${profile.email}`}>{profile.email}</a>
       </li>
       <li>
-        <ExternalLink href={site.socials.github}>GitHub</ExternalLink>
+        <ExternalLink href={profile.socials.github}>GitHub</ExternalLink>
       </li>
       <li>
-        <ExternalLink href={site.socials.linkedin}>LinkedIn</ExternalLink>
+        <ExternalLink href={profile.socials.linkedin}>LinkedIn</ExternalLink>
       </li>
       <li>
-        {site.resume.published ? (
-          <a href={resumeHref}>Résumé</a>
+        {profile.resume.published ? (
+          <a href={resume}>Résumé</a>
         ) : (
-          <ExternalLink href={resumeHref}>Résumé</ExternalLink>
+          <ExternalLink href={resume}>Résumé</ExternalLink>
         )}
       </li>
     </ul>
     <p class="mt-4">
-      © {new Date().getFullYear()}
-      {site.name} · Built with Astro
-      {site.sourceUrl && (
+      {`© ${new Date().getFullYear()} ${profile.name} · Built with Astro`}
+      {sourceUrl && (
         <>
-          · <ExternalLink href={site.sourceUrl}>Source</ExternalLink>
+          · <ExternalLink href={sourceUrl}>Source</ExternalLink>
         </>
       )}
     </p>

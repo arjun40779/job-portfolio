@@ -1,0 +1,47 @@
+---
+import type { Reference, SkillGroup } from "../lib/content";
+import Card from "./Card.astro";
+
+interface Props {
+  group: SkillGroup;
+  references: Map<string, Reference>;
+}
+
+const { group, references } = Astro.props;
+const headingId = `skills-${group.id}`;
+---
+
+<Card as="section" aria-labelledby={headingId} class="p-6">
+  <h4 id={headingId} class="font-semibold">
+    {group.title}
+  </h4>
+  <ul class="mt-4 space-y-3 text-meta">
+    {group.items.map((item) => {
+      // Only link to things that are on the page in this build.
+      const refs = [...new Set(item.usedIn)]
+        .map((id) => references.get(id))
+        .filter((ref): ref is Reference => ref !== undefined);
+      return (
+        <li>
+          <span class="font-medium">{item.name}</span>
+          {refs.length > 0 && (
+            <span class="block text-text-muted">
+              Used in{" "}
+              {refs.map((ref, i) => (
+                <>
+                  {i > 0 && ", "}
+                  <a
+                    href={ref.href}
+                    class="underline decoration-1 underline-offset-2"
+                  >
+                    {ref.label}
+                  </a>
+                </>
+              ))}
+            </span>
+          )}
+        </li>
+      );
+    })}
+  </ul>
+</Card>

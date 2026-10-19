@@ -14,6 +14,7 @@
 | 1 | Initial draft (Next.js) |
 | 2 | Review decisions: **Astro**, Apple's web palette, **email link only**, **root domain**, placeholders for missing assets, content from the resume |
 | 3 | **Review round 2:** project evidence moved up the page (§3); left-aligned hero with real work (§4.2); claims register (§5.4); colour contrast fixed, with separate button tokens (§4.3); interaction scope defined, with `ClientRouter` dropped (§2.1); performance test conditions made reproducible (§7); content contract completed (§5.6); launch acceptance checks and publication gates added (§8); tag filtering deferred; skills cut to 3 groups; header simplified; fewer background bands |
+| 3.1 | **M3 build notes:** content contract now points at `src/content.config.ts` as the source of truth (§5.6) and adds `caseStudyApproved`, `clientOrder` and profile fields; a separate gate for the Pexit card versus its case study (§8.2); reveal-on-scroll safety nets made precise (§2.1) |
 
 ---
 
@@ -70,7 +71,7 @@ This is the complete list of client-side behaviour. Anything not listed here shi
 |---|---|---|---|---|
 | 1 | **Theme toggle** (light / dark / system) | Inline `<head>` script (~0.5 KB) + toggle handler | Follows the OS setting via `prefers-color-scheme`. The toggle button is rendered `hidden` and only shown by the script. | The choice is stored in `localStorage` (wrapped in try/catch) and applied before first paint on every page load. |
 | 2 | **Copy email** button | Yes | The button stays `hidden`. The `mailto:` link and the visible email text always work. | Shown only when `navigator.clipboard` exists. On success: "Email copied" through an `aria-live="polite"` region. On failure: "Couldn't copy. Email: arjun40779@gmail.com". |
-| 3 | **Reveal on scroll** | Yes (`IntersectionObserver`) | **All content is visible.** The hidden starting state only applies under `html.js` (set by the head script) and when `prefers-reduced-motion: no-preference`. | Content is never hidden from crawlers or for a failed script. As a safety net, every pending element is revealed after 1.5s regardless. |
+| 3 | **Reveal on scroll** | Yes (`IntersectionObserver`) | **All content is visible.** The hidden starting state only applies under `html.js` (set by the head script) and when `prefers-reduced-motion: no-preference`. | Content is never hidden from crawlers or for a failed script. Safety nets: a CSS-only animation reveals everything after 2s if the reveal script never runs; if `IntersectionObserver` is missing, or hasn't reported within 1.5s, everything is revealed at once. |
 | — | Page transitions | No (CSS only) | Normal navigation | Native View Transitions. |
 | — | Navigation | No | — | **No mobile menu.** The header has only 3 links plus Résumé, so it fits a 320px screen without one (§4.2). That removes a focus trap and its script. |
 
@@ -335,86 +336,26 @@ Every numeric or strong claim needs **what was measured, the baseline, how it wa
 
 ### 5.6 Content contract
 
-```ts
-// src/content.config.ts
-import { defineCollection, z } from "astro:content";
-import { file, glob } from "astro/loaders";
+The schemas live in **`src/content.config.ts`**, which is the source of truth (this section summarises it rather than copying it, so the two can't drift). Content files are in `src/content/`:
 
-const YearMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Use YYYY-MM");
+| File | Shape | Key fields |
+|---|---|---|
+| `profile.json` | One object keyed by id (`{ "main": { … } }`) | name, title, statement, subline, description, location, experienceSummary, email, openToWork, socials, `resume { path, published }`, about, education[] |
+| `experience.json` | Array; each entry has a stable, unique `id` (e.g. `updot-pexit`) | company, product?, role, `start`/`end` as `YYYY-MM` (`end: null` = present, must be ≥ start), 1–3 bullets, tech[], evidence[] |
+| `skills.json` | Array of 3 groups with ids `backend` / `frontend` / `delivery` | items[] of `{ name, usedIn[] }` where `usedIn` holds project or experience ids |
+| `projects/<slug>.mdx` | id = file name; frontmatter + MDX case study body | title, summary, `ownership` (personal / freelance-client / employer / agency-client), `featuredRank?`, `clientOrder?`, `facts?` (required when featured), contribution, outcome, evidence[], cover? + coverAlt, **`publicationApproved`** (the card), **`caseStudyApproved`** (the case study page), live?, code?, tags[] |
 
-const evidence = z.object({
-  label: z.string(),                 // "LCP on product pages"
-  value: z.string(),                 // "−30%"
-  baseline: z.string(),              // "3.1s → 2.2s"
-  method: z.string(),                // "Lighthouse mobile, median of 5 runs"
-  myRole: z.string(),                // "Implemented ISR + bundle split"
-});
+Prominence (`featuredRank`) and ownership are independent: a freelance or employer project can be featured, and agency client work appears in the compact list ordered by `clientOrder`.
 
-// profile.json → a single object keyed by id: { "main": { ... } }
-const profile = defineCollection({
-  loader: file("src/content/profile.json"),
-  schema: z.object({
-    name: z.string(), statement: z.string(), subline: z.string(),
-    location: z.string(), email: z.string().email(), openToWork: z.boolean(),
-    socials: z.object({ github: z.string().url(), linkedin: z.string().url() }),
-    resume: z.object({ path: z.string(), published: z.boolean() }),
-    about: z.string(),
-  }),
-});
+Each `evidence` entry records `label`, `value`, `baseline`, `method` and `myRole` (§5.4).
 
-// experience.json → array; every entry has a stable, unique `id` (e.g. "updot-pexit")
-const experience = defineCollection({
-  loader: file("src/content/experience.json"),
-  schema: z.object({
-    id: z.string().regex(/^[a-z0-9-]+$/),
-    company: z.string(), product: z.string().optional(), role: z.string(),
-    start: YearMonth, end: YearMonth.nullable(),          // null = present
-    bullets: z.array(z.string()).min(1).max(3),
-    tech: z.array(z.string()),
-    evidence: z.array(evidence).default([]),
-  }).refine((e) => e.end === null || e.end >= e.start, "end must be ≥ start"),
-});
+**Rules checked at build** (pure functions in `src/lib/content-rules.ts`, unit tested and applied by `src/lib/content.ts`; any violation fails the build):
 
-// skills.json → array of 3 groups with ids "backend" | "frontend" | "delivery"
-const skills = defineCollection({
-  loader: file("src/content/skills.json"),
-  schema: z.object({
-    id: z.enum(["backend", "frontend", "delivery"]),
-    title: z.string(),
-    items: z.array(z.object({ name: z.string(), usedIn: z.array(z.string()).default([]) })),
-  }),
-});
-
-// projects/<slug>.mdx → id = file name; `featuredRank` and `ownership` are independent
-const projects = defineCollection({
-  loader: glob({ pattern: "**/*.mdx", base: "src/content/projects" }),
-  schema: ({ image }) => z.object({
-    title: z.string(),
-    summary: z.string(),
-    ownership: z.enum(["personal", "freelance-client", "employer", "agency-client"]),
-    featuredRank: z.number().int().min(1).optional(),     // present = featured; 1 = large card
-    hasCaseStudy: z.boolean().default(true),
-    facts: z.object({ role: z.string(), team: z.string(), timeline: z.string(), scope: z.string() }),
-    contribution: z.string(),                              // "I built …", shown on the card
-    outcome: z.string(),                                   // concrete, per §5.4
-    evidence: z.array(evidence).default([]),
-    cover: image().optional(), coverAlt: z.string().optional(),
-    publicationApproved: z.boolean(),                      // gate for employer / client work
-    live: z.string().url().optional(), code: z.string().url().optional(),
-    tags: z.array(z.string()),
-  }).refine((p) => !p.cover || !!p.coverAlt, "cover requires coverAlt"),
-});
-
-export const collections = { profile, experience, skills, projects };
-```
-
-**Rules checked at build** (in `src/lib/content.ts`, which fails the build on any violation):
-
-- `featuredRank` values are unique and contiguous from 1. The home page shows ranks 1–3. Rank 1 gets the large card.
+- `featuredRank` values are unique and contiguous from 1 **among the projects that ship in that build**. The home page shows the featured projects in rank order. Rank 1 gets the large card.
 - Experience is sorted by `start` descending, so the order in the JSON file doesn't matter. At most one entry has `end: null`.
 - Every `usedIn` reference resolves to a project id or an experience id.
-- In production builds, any project with `publicationApproved: false` is excluded (with a build warning). Preview builds show it with a "Draft" badge.
-- Every number on a card or bullet that contains a digit and a `%` comes from an `evidence` entry. A lint check flags raw percentages in `outcome` and `bullets`.
+- In production builds, any project with `publicationApproved: false` is excluded. Draft builds (`astro dev`, Vercel preview deployments, or `SHOW_DRAFTS=true`) show it with a "Draft" badge.
+- A percentage (a digit followed by `%`) in a project's contribution or outcome, or in an experience bullet, fails the build unless that entry has `evidence`.
 
 ---
 
@@ -501,8 +442,8 @@ Each milestone is a PR with a Vercel preview link.
 | Gate | Requirement |
 |---|---|
 | **Public résumé** | Decide: publish the current PDF (includes phone number), or a web version without it. Until then, the Résumé link points to LinkedIn and `resume.published = false`. |
-| **Employer case study (Pexit)** | Written OK from Updot to describe the architecture publicly, and for which screenshots/diagrams. Otherwise the Pexit card shows a scope-only description and no case study. |
-| **Client work naming** | Confirm each client in §5.4 may be named. |
+| **Employer case study (Pexit)** | Written OK from Updot to describe the architecture publicly, and for which screenshots/diagrams (`caseStudyApproved`). Until then the Pexit card shows only the scope already public on the résumé (`publicationApproved: true`) and no case study. |
+| **Client work naming** | Confirm each client in §5.4 may be named. Until then they are `publicationApproved: false`, so they appear only in draft builds. |
 | **Claims** | Every row in §5.4 is either evidenced or switched to its fallback wording. |
 | **Project evidence** | All 3 featured projects have a screenshot or diagram, a contribution line and an outcome line. **Required.** |
 | Portrait | **Not required** for launch. |

@@ -1,0 +1,31 @@
+---
+interface Props {
+  email: string;
+}
+
+const { email } = Astro.props;
+---
+
+<div data-copy-email={email} class="flex flex-wrap items-center gap-3">
+  <!-- Hidden until the script confirms the Clipboard API is available. -->
+  <button
+    type="button"
+    data-copy-button
+    hidden
+    class="inline-flex cursor-pointer items-center rounded-full border border-control-border px-3.5 py-1.5 text-meta font-medium text-text transition-colors duration-200 hover:border-text motion-reduce:transition-none"
+  >
+    Copy email
+  </button>
+  <p
+    data-copy-status
+    role="status"
+    aria-live="polite"
+    class="text-meta text-text-muted"
+  ></p>
+</div>
+
+<script>
+  import { initCopyEmail } from "../scripts/copy-email";
+
+  initCopyEmail();
+</script>

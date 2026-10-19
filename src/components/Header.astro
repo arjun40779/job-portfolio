@@ -1,8 +1,11 @@
 ---
-import { navLinks, resumeHref, site } from "../lib/site";
+import { getSiteContent } from "../lib/content";
+import { navLinks, resumeHref } from "../lib/site";
 import Button from "./Button.astro";
 import Container from "./Container.astro";
 import ThemeToggle from "./ThemeToggle.astro";
+
+const { profile } = await getSiteContent();
 ---
 
 <header class="sticky top-0 z-40 border-b border-divider bg-(--header-bg) backdrop-blur-[20px] backdrop-saturate-[1.8]">
@@ -15,7 +18,7 @@ import ThemeToggle from "./ThemeToggle.astro";
       href="/"
       class="col-start-1 row-start-1 text-[15px] font-semibold text-text hover:text-text hover:no-underline"
     >
-      {site.name}
+      {profile.name}
     </a>
     <nav aria-label="Primary" class="col-span-2 row-start-2 md:ml-auto">
       <ul class="flex items-center gap-x-4 text-meta md:gap-x-6">
@@ -27,13 +30,14 @@ import ThemeToggle from "./ThemeToggle.astro";
           </li>
         ))}
         <li class="ml-auto md:ml-0">
-          <Button href={resumeHref} size="sm">
+          <Button href={resumeHref(profile)} size="sm">
             Résumé
           </Button>
         </li>
       </ul>
     </nav>
-    <div class="col-start-2 row-start-1 flex justify-end">
+    <!-- Reserves the toggle's size (34×94px) so revealing it doesn't shift the page. -->
+    <div class="col-start-2 row-start-1 flex min-h-[34px] min-w-[94px] justify-end">
       <ThemeToggle />
     </div>
   </Container>
