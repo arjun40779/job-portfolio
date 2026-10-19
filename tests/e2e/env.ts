@@ -1,9 +1,12 @@
 /** True when the suite runs against a draft build (SHOW_DRAFTS=true pnpm build). */
 export const drafts = process.env.SHOW_DRAFTS === "true";
 
-/** Case study routes present in draft builds; production has none until approved. */
-export const draftCaseStudies = [
-  { slug: "pexit", title: "Pexit" },
-  { slug: "pginkokrajhar", title: "PGSinKokrajhar" },
-  { slug: "horizonvision-group", title: "HorizonVision Group" },
+/** Featured case studies in rank order; `live` ones are published in production. */
+export const allCaseStudies = [
+  { slug: "pexit", title: "Pexit", live: false },
+  { slug: "pginkokrajhar", title: "PGSinKokrajhar", live: true },
+  { slug: "horizonvision-group", title: "HorizonVision Group", live: true },
 ] as const;
+
+/** Case studies in the build under test, in rank order. */
+export const caseStudies = allCaseStudies.filter((c) => drafts || c.live);
