@@ -27,7 +27,12 @@ if (!entry) throw new Error(`No project entry for "${project.id}"`);
 const { Content } = await render(entry);
 ---
 
-<BaseLayout title={project.title} description={project.summary}>
+<BaseLayout
+  title={project.title}
+  description={project.summary}
+  ogImage={`/og/projects-${project.id}.png`}
+  ogImageAlt={`${project.title} case study by Arjun Singh`}
+>
   <article aria-labelledby="case-title" class="pb-8">
     <Container class="pt-10 md:pt-14">
       <div class="flex flex-wrap items-center gap-3 text-meta">

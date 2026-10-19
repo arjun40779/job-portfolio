@@ -63,11 +63,15 @@ const typeScale = [
           <ul class="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             {Object.entries(values).map(([token, hex]) => (
               <li>
-                <span
-                  class="block h-14 rounded-xl border border-divider"
-                  style={`background-color: ${hex}`}
+                {/* SVG fills, not style attributes, so the CSP needs no 'unsafe-inline'. */}
+                <svg
+                  viewBox="0 0 4 1"
+                  preserveAspectRatio="none"
+                  class="block h-14 w-full rounded-xl border border-divider"
                   aria-hidden="true"
-                />
+                >
+                  <rect width="4" height="1" fill={hex} />
+                </svg>
                 <span class="mt-2 block text-meta font-medium">--{token}</span>
                 <span class="block font-mono text-tag text-text-muted">
                   {hex}
@@ -109,25 +113,50 @@ const typeScale = [
                   <tr class="border-b border-divider">
                     <td class="py-2 pr-4">
                       {row.min >= 4.5 ? (
-                        <span
-                          class="inline-grid size-9 place-items-center rounded-lg font-semibold"
-                          style={`color: ${row.fgHex}; background-color: ${row.bgHex}`}
+                        <svg
+                          viewBox="0 0 36 36"
+                          class="size-9"
                           aria-hidden="true"
                         >
-                          Aa
-                        </span>
+                          <rect
+                            width="36"
+                            height="36"
+                            rx="8"
+                            fill={row.bgHex}
+                          />
+                          <text
+                            x="18"
+                            y="23"
+                            text-anchor="middle"
+                            font-size="14"
+                            font-weight="600"
+                            fill={row.fgHex}
+                          >
+                            Aa
+                          </text>
+                        </svg>
                       ) : (
                         // Non-text pairs (boundaries, focus, status) are shown as a shape.
-                        <span
-                          class="inline-grid size-9 place-items-center rounded-lg"
-                          style={`background-color: ${row.bgHex}`}
+                        <svg
+                          viewBox="0 0 36 36"
+                          class="size-9"
                           aria-hidden="true"
                         >
-                          <span
-                            class="block size-5 rounded-full border-2"
-                            style={`border-color: ${row.fgHex}`}
+                          <rect
+                            width="36"
+                            height="36"
+                            rx="8"
+                            fill={row.bgHex}
                           />
-                        </span>
+                          <circle
+                            cx="18"
+                            cy="18"
+                            r="9"
+                            fill="none"
+                            stroke={row.fgHex}
+                            stroke-width="2"
+                          />
+                        </svg>
                       )}
                     </td>
                     <td class="py-2 pr-4 font-mono text-tag">
