@@ -1,0 +1,28 @@
+---
+interface Props {
+  facts: { role: string; team: string; timeline: string; scope: string };
+  class?: string;
+}
+
+const { facts, class: className } = Astro.props;
+const items = [
+  { label: "Role", value: facts.role },
+  { label: "Team", value: facts.team },
+  { label: "Timeline", value: facts.timeline },
+  { label: "Scope", value: facts.scope },
+];
+---
+
+<dl
+  class:list={[
+    "grid grid-cols-2 gap-6 border-y border-divider py-6 md:grid-cols-4",
+    className,
+  ]}
+>
+  {items.map(({ label, value }) => (
+    <div>
+      <dt class="text-meta text-text-muted">{label}</dt>
+      <dd class="mt-1 font-medium">{value}</dd>
+    </div>
+  ))}
+</dl>

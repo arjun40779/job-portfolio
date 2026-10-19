@@ -15,6 +15,7 @@
 | 2 | Review decisions: **Astro**, Apple's web palette, **email link only**, **root domain**, placeholders for missing assets, content from the resume |
 | 3 | **Review round 2:** project evidence moved up the page (§3); left-aligned hero with real work (§4.2); claims register (§5.4); colour contrast fixed, with separate button tokens (§4.3); interaction scope defined, with `ClientRouter` dropped (§2.1); performance test conditions made reproducible (§7); content contract completed (§5.6); launch acceptance checks and publication gates added (§8); tag filtering deferred; skills cut to 3 groups; header simplified; fewer background bands |
 | 3.1 | **M3 build notes:** content contract now points at `src/content.config.ts` as the source of truth (§5.6) and adds `caseStudyApproved`, `clientOrder` and profile fields; a separate gate for the Pexit card versus its case study (§8.2); reveal-on-scroll safety nets made precise (§2.1) |
+| 3.2 | **M4 build notes:** `placeholderContent` flag keeps invented case-study text out of production (§5.6, §8.2); CI tests both a production and a draft build, and Lighthouse runs on the draft build so case study routes are measured (§7.1); `/projects` index still deferred (§3) |
 
 ---
 
@@ -343,7 +344,7 @@ The schemas live in **`src/content.config.ts`**, which is the source of truth (t
 | `profile.json` | One object keyed by id (`{ "main": { … } }`) | name, title, statement, subline, description, location, experienceSummary, email, openToWork, socials, `resume { path, published }`, about, education[] |
 | `experience.json` | Array; each entry has a stable, unique `id` (e.g. `updot-pexit`) | company, product?, role, `start`/`end` as `YYYY-MM` (`end: null` = present, must be ≥ start), 1–3 bullets, tech[], evidence[] |
 | `skills.json` | Array of 3 groups with ids `backend` / `frontend` / `delivery` | items[] of `{ name, usedIn[] }` where `usedIn` holds project or experience ids |
-| `projects/<slug>.mdx` | id = file name; frontmatter + MDX case study body | title, summary, `ownership` (personal / freelance-client / employer / agency-client), `featuredRank?`, `clientOrder?`, `facts?` (required when featured), contribution, outcome, evidence[], cover? + coverAlt, **`publicationApproved`** (the card), **`caseStudyApproved`** (the case study page), live?, code?, tags[] |
+| `projects/<slug>.mdx` | id = file name; frontmatter + MDX case study body | title, summary, `ownership` (personal / freelance-client / employer / agency-client), `featuredRank?`, `clientOrder?`, `facts?` (required when featured), contribution, outcome, evidence[], cover? + coverAlt, **`publicationApproved`** (the card), **`caseStudyApproved`** (the case study page), **`placeholderContent`** (body is placeholder text), live?, code?, tags[] |
 
 Prominence (`featuredRank`) and ownership are independent: a freelance or employer project can be featured, and agency client work appears in the compact list ordered by `clientOrder`.
 
@@ -355,6 +356,7 @@ Each `evidence` entry records `label`, `value`, `baseline`, `method` and `myRole
 - Experience is sorted by `start` descending, so the order in the JSON file doesn't matter. At most one entry has `end: null`.
 - Every `usedIn` reference resolves to a project id or an experience id.
 - In production builds, any project with `publicationApproved: false` is excluded. Draft builds (`astro dev`, Vercel preview deployments, or `SHOW_DRAFTS=true`) show it with a "Draft" badge.
+- A featured project gets a case study page in production only when `caseStudyApproved` is true **and** `placeholderContent` is false. Draft builds render every featured case study, marked "Draft".
 - A percentage (a digit followed by `%`) in a project's contribution or outcome, or in an experience bullet, fails the build unless that entry has `evidence`.
 
 ---
@@ -393,8 +395,8 @@ job-portfolio/
 | Tool | Lighthouse CI (`@lhci/cli`), **mobile preset** (Lighthouse default emulated Moto G Power) |
 | Network / CPU throttling | Lighthouse **simulated** throttling: 150 ms RTT, 1.6 Mbps down / 750 Kbps up, **4× CPU slowdown** |
 | Cache | **Cold**: a fresh Chrome profile per run, storage cleared |
-| Server | Production build (`astro build`) served by `astro preview` in CI; repeated against the Vercel preview URL before launch |
-| Routes | `/`, `/projects/pexit`, `/projects/pginkokrajhar`, `/404` |
+| Server | `astro preview` in CI, serving the **draft build** (`SHOW_DRAFTS=true`), which is the production build plus draft pages, so case study routes are measured before they ship; repeated against the Vercel preview URL before launch |
+| Routes | `/`, `/projects/pexit/`, `/projects/pginkokrajhar/`. `/404` is checked by axe and E2E instead, because Lighthouse marks down any page served with a 404 status. |
 | Runs | **5 runs per route; the median run is asserted** |
 | Themes | Run in light mode. An axe pass also runs in dark mode (Playwright, `colorScheme: 'dark'`). |
 
@@ -445,6 +447,7 @@ Each milestone is a PR with a Vercel preview link.
 | **Employer case study (Pexit)** | Written OK from Updot to describe the architecture publicly, and for which screenshots/diagrams (`caseStudyApproved`). Until then the Pexit card shows only the scope already public on the résumé (`publicationApproved: true`) and no case study. |
 | **Client work naming** | Confirm each client in §5.4 may be named. Until then they are `publicationApproved: false`, so they appear only in draft builds. |
 | **Claims** | Every row in §5.4 is either evidenced or switched to its fallback wording. |
+| **Case study text** | Each case study's placeholder text is replaced with the real story and its `placeholderContent` flag removed. Production builds skip flagged pages automatically. |
 | **Project evidence** | All 3 featured projects have a screenshot or diagram, a contribution line and an outcome line. **Required.** |
 | Portrait | **Not required** for launch. |
 | `arjun.buzz` | If it currently hosts something, confirm replacing it. DNS access confirmed. |

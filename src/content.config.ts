@@ -110,7 +110,10 @@ const projects = defineCollection({
         cover: image().optional(),
         coverAlt: z.string().optional(),
         publicationApproved: z.boolean(), // gate for the card itself
-        caseStudyApproved: z.boolean(), // separate gate for the case study page (M4)
+        caseStudyApproved: z.boolean(), // separate gate for the case study page
+        // True while the case study body is placeholder text. Such pages only
+        // ship in draft builds, so invented content never reaches production.
+        placeholderContent: z.boolean().default(false),
         live: z.url().optional(),
         code: z.url().optional(),
         tags: z.array(z.string()),

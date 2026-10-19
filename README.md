@@ -2,7 +2,7 @@
 
 Personal portfolio site for job hunting. It shows projects, experience and skills. Built with Astro and Tailwind CSS, and deployed to `arjun.buzz`.
 
-**Status:** M3 (home page with placeholder images). The component preview lives at `/styleguide`; run `SHOW_DRAFTS=true pnpm build` to include unapproved content. See [`docs/DESIGN.md`](docs/DESIGN.md) for the stack, information architecture, visual design, content contract and launch checks.
+**Status:** M4 (home page and case study template; images and real case-study text pending). The component preview lives at `/styleguide`; run `SHOW_DRAFTS=true pnpm build` to include unapproved content. See [`docs/DESIGN.md`](docs/DESIGN.md) for the stack, information architecture, visual design, content contract and launch checks.
 
 ## Development
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   contentErrors,
+  hasCaseStudyPage,
   sortExperience,
   visibleProjects,
   type ExperienceLike,
@@ -180,5 +181,41 @@ describe("format", () => {
     expect(formatYearMonth("2026-07")).toBe("Jul 2026");
     expect(formatRange("2024-03", "2025-08")).toBe("Mar 2024 – Aug 2025");
     expect(formatRange("2026-07", null)).toBe("Jul 2026 – Present");
+  });
+});
+
+describe("hasCaseStudyPage", () => {
+  const ready = {
+    featuredRank: 1,
+    caseStudyApproved: true,
+    placeholderContent: false,
+  };
+
+  it("publishes approved, real case studies", () => {
+    expect(hasCaseStudyPage(ready, false)).toBe(true);
+  });
+
+  it("keeps placeholder or unapproved case studies out of production", () => {
+    expect(
+      hasCaseStudyPage({ ...ready, placeholderContent: true }, false),
+    ).toBe(false);
+    expect(
+      hasCaseStudyPage({ ...ready, caseStudyApproved: false }, false),
+    ).toBe(false);
+  });
+
+  it("shows every featured case study in draft builds", () => {
+    expect(
+      hasCaseStudyPage(
+        { ...ready, placeholderContent: true, caseStudyApproved: false },
+        true,
+      ),
+    ).toBe(true);
+  });
+
+  it("never creates pages for projects that aren't featured", () => {
+    expect(hasCaseStudyPage({ ...ready, featuredRank: undefined }, true)).toBe(
+      false,
+    );
   });
 });
