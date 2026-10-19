@@ -1,0 +1,67 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// M1 placeholder shell. Real sections and content collections arrive in M2–M3.
+const email = "arjun40779@gmail.com";
+const links = [
+  { label: "GitHub", href: "https://github.com/arjun40779" },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/arjun-singh-541554117",
+  },
+];
+---
+
+<BaseLayout>
+  <header class="border-b border-divider">
+    <div class="mx-auto flex h-12 max-w-[980px] items-center px-4 sm:px-6">
+      <a
+        href="/"
+        class="text-[15px] font-semibold text-text hover:text-text hover:no-underline"
+      >
+        Arjun Singh
+      </a>
+    </div>
+  </header>
+
+  <main
+    id="main"
+    tabindex="-1"
+    class="mx-auto max-w-[980px] px-4 py-24 outline-none sm:px-6"
+  >
+    <p class="mb-4 flex items-center gap-2 text-sm text-text">
+      <span class="size-2 rounded-full bg-success" aria-hidden="true"></span>
+      Open to work
+    </p>
+    <h1 class="text-[clamp(2.75rem,6vw,4.5rem)] leading-[1.05] font-semibold tracking-[-0.015em]">
+      Arjun Singh
+    </h1>
+    <p class="mt-4 max-w-[34ch] text-[clamp(1.375rem,2.5vw,1.75rem)] leading-tight font-medium tracking-[-0.01em] text-text-muted">
+      Full-stack engineer building production web applications.
+    </p>
+    <p class="mt-6 max-w-[68ch] text-text-muted">
+      This site is being built. In the meantime, reach me by email or find my
+      work on GitHub.
+    </p>
+
+    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+      <a
+        href={`mailto:${email}`}
+        class="rounded-full bg-btn-primary px-5 py-2.5 text-btn-primary-fg hover:bg-btn-primary-hover hover:text-btn-primary-fg hover:no-underline active:bg-btn-primary-active"
+      >
+        Email me
+      </a>
+      {links.map(({ label, href }) => (
+        <a href={href} rel="noopener noreferrer">
+          {label} ›
+        </a>
+      ))}
+    </div>
+  </main>
+
+  <footer class="border-t border-divider">
+    <div class="mx-auto max-w-[980px] px-4 py-8 text-sm text-text-muted sm:px-6">
+      © {new Date().getFullYear()} Arjun Singh · Built with Astro
+    </div>
+  </footer>
+</BaseLayout>
