@@ -8,6 +8,10 @@ import icon from "astro-icon";
 export default defineConfig({
   site: "https://arjun.buzz",
   output: "static",
+  security: {
+    // Hash-based CSP <meta> for every page (scripts and styles Astro emits).
+    csp: true,
+  },
   integrations: [
     icon(),
     mdx(),
