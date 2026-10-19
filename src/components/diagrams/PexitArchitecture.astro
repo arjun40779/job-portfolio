@@ -1,0 +1,183 @@
+---
+// High-level Pexit backend architecture, drawn from the scope already on the
+// résumé. Shown only when the project's diagramApproved flag allows it.
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const modules = [
+  { label: "Auth & sessions", y: 110 },
+  { label: "Circle social graph", y: 170 },
+  { label: "Posts, comments, feed", y: 230 },
+  { label: "Listings", y: 290 },
+  { label: "Asset service", y: 350 },
+];
+
+const stores = [
+  { label: "Redis", note: "sessions, rate limits", y: 110, h: 44 },
+  { label: "Neo4j", note: "connections, mutuals", y: 170, h: 44 },
+  { label: "PostgreSQL", note: "source of truth", y: 230, h: 104 },
+  { label: "Supabase Storage", note: "per-type buckets", y: 350, h: 44 },
+];
+
+// Module rows that write to each store (by index), for the connector lines.
+const links = [
+  [0, 0],
+  [1, 1],
+  [2, 2],
+  [3, 2],
+  [4, 3],
+];
+---
+
+<svg
+  viewBox="0 0 800 500"
+  role="img"
+  aria-labelledby="pexit-arch-title pexit-arch-desc"
+  class:list={["pexit-arch block aspect-16/10 w-full bg-surface", className]}
+>
+  <title id="pexit-arch-title">Pexit architecture</title>
+  <desc id="pexit-arch-desc">
+    A React web app calls a Fastify API over REST with JWTs. The API has five
+    modules: auth and sessions backed by Redis, the Circle social graph backed
+    by Neo4j, posts, comments and feed plus listings backed by PostgreSQL, and
+    an asset service backed by Supabase Storage.
+  </desc>
+  <defs>
+    <marker
+      id="pexit-arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="7"
+      markerHeight="7"
+      orient="auto"
+    >
+      <path d="M0 0 L10 5 L0 10 z" class="arch-arrowhead"></path>
+    </marker>
+  </defs>
+
+  <!-- Client -->
+  <rect x="30" y="200" width="160" height="100" rx="14" class="arch-box"></rect>
+  <text x="110" y="244" text-anchor="middle" class="arch-label">
+    React
+  </text>
+  <text x="110" y="268" text-anchor="middle" class="arch-note">
+    web app
+  </text>
+
+  <line
+    x1="190"
+    y1="250"
+    x2="258"
+    y2="250"
+    class="arch-line"
+    marker-end="url(#pexit-arrow)"
+  ></line>
+  <text x="224" y="236" text-anchor="middle" class="arch-note">
+    REST
+  </text>
+
+  <!-- API -->
+  <rect
+    x="260"
+    y="50"
+    width="280"
+    height="370"
+    rx="18"
+    class="arch-frame"
+  ></rect>
+  <text x="400" y="84" text-anchor="middle" class="arch-label">
+    Fastify API
+  </text>
+  {modules.map(({ label, y }) => (
+    <>
+      <rect x="280" y={y} width="240" height="44" rx="10" class="arch-box" />
+      <text x="400" y={y + 28} text-anchor="middle" class="arch-module">
+        {label}
+      </text>
+    </>
+  ))}
+
+  <!-- Data stores -->
+  {stores.map(({ label, note, y, h }) => (
+    <>
+      <rect x="610" y={y} width="170" height={h} rx="10" class="arch-store" />
+      <text x="695" y={y + h / 2 - 3} text-anchor="middle" class="arch-module">
+        {label}
+      </text>
+      <text x="695" y={y + h / 2 + 15} text-anchor="middle" class="arch-note">
+        {note}
+      </text>
+    </>
+  ))}
+
+  {links.map(([from, to]) => {
+    const fromModule = modules[from ?? 0];
+    const toStore = stores[to ?? 0];
+    if (!fromModule || !toStore) return null;
+    const y1 = fromModule.y + 22;
+    const y2 = Math.min(
+      Math.max(y1, toStore.y + 10),
+      toStore.y + toStore.h - 10,
+    );
+    return (
+      <line
+        x1="520"
+        y1={y1}
+        x2="608"
+        y2={y2}
+        class="arch-line"
+        marker-end="url(#pexit-arrow)"
+      />
+    );
+  })}
+
+  <text x="400" y="470" text-anchor="middle" class="arch-note">
+    Unit and real-PostgreSQL integration tests · OpenAPI docs per module
+  </text>
+</svg>
+
+<style>
+  .pexit-arch .arch-frame {
+    fill: var(--bg);
+    stroke: var(--control-border);
+    stroke-width: 1.5;
+  }
+  .pexit-arch .arch-box {
+    fill: var(--surface);
+    stroke: var(--control-border);
+    stroke-width: 1.5;
+  }
+  .pexit-arch .arch-store {
+    fill: var(--bg);
+    stroke: var(--focus-ring);
+    stroke-width: 1.5;
+  }
+  .pexit-arch .arch-line {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+  .pexit-arch .arch-arrowhead {
+    fill: var(--text-muted);
+  }
+  .pexit-arch text {
+    font-family: var(--font-sans);
+  }
+  .pexit-arch .arch-label {
+    fill: var(--text);
+    font-size: 22px;
+    font-weight: 600;
+  }
+  .pexit-arch .arch-module {
+    fill: var(--text);
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .pexit-arch .arch-note {
+    fill: var(--text-muted);
+    font-size: 13px;
+  }
+</style>

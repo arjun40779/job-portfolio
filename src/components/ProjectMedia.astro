@@ -1,12 +1,14 @@
 ---
 import { Picture } from "astro:assets";
 import type { Project } from "../lib/content";
+import PexitArchitecture from "./diagrams/PexitArchitecture.astro";
 
 interface Props {
   project: Project;
   /** Round the corners when the media stands alone (not inside a card). */
   rounded?: boolean;
   sizes?: string;
+  /** Above-the-fold media (hero, case study opening): load first. */
   eager?: boolean;
   class?: string;
 }
@@ -18,9 +20,15 @@ const {
   eager = false,
   class: className,
 } = Astro.props;
+
+const diagrams = { "pexit-architecture": PexitArchitecture };
+const Diagram =
+  project.showDiagram && project.diagram
+    ? diagrams[project.diagram]
+    : undefined;
 ---
 
-{project.cover && project.coverAlt ? (
+{project.showCover && project.cover && project.coverAlt ? (
   <Picture
     src={project.cover}
     alt={project.coverAlt}
@@ -28,20 +36,26 @@ const {
     widths={[480, 800, 1200]}
     sizes={sizes}
     loading={eager ? "eager" : "lazy"}
+    fetchpriority={eager ? "high" : undefined}
     class:list={[
       "aspect-16/10 w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100",
       rounded && "rounded-card",
       className,
     ]}
   />
+) : Diagram ? (
+  // Diagrams for private work. Inside a card it is inset like the placeholder.
+  <div class:list={[!rounded && "p-3 pb-0", className]}>
+    <Diagram class="overflow-hidden rounded-xl border border-divider" />
+  </div>
 ) : (
-  // Placeholder until real screenshots arrive (M5). Inside a card it is inset
-  // so the card's own shape stays visible on a --surface band.
+  // Placeholder until a screenshot or diagram is added. Inside a card it is
+  // inset so the card's own shape stays visible on a --surface band.
   <div class:list={[!rounded && "p-3 pb-0", className]}>
     <div class="grid aspect-16/10 w-full place-items-center rounded-xl border border-dashed border-control-border bg-surface p-6 text-center">
       <div>
         <p class="text-h3 text-text-muted">{project.title}</p>
-        <p class="mt-1 text-meta text-text-muted">Screenshot coming soon</p>
+        <p class="mt-1 text-meta text-text-muted">Image coming soon</p>
       </div>
     </div>
   </div>
