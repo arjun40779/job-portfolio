@@ -16,6 +16,7 @@
 | 3 | **Review round 2:** project evidence moved up the page (§3); left-aligned hero with real work (§4.2); claims register (§5.4); colour contrast fixed, with separate button tokens (§4.3); interaction scope defined, with `ClientRouter` dropped (§2.1); performance test conditions made reproducible (§7); content contract completed (§5.6); launch acceptance checks and publication gates added (§8); tag filtering deferred; skills cut to 3 groups; header simplified; fewer background bands |
 | 3.1 | **M3 build notes:** content contract now points at `src/content.config.ts` as the source of truth (§5.6) and adds `caseStudyApproved`, `clientOrder` and profile fields; a separate gate for the Pexit card versus its case study (§8.2); reveal-on-scroll safety nets made precise (§2.1) |
 | 3.2 | **M4 build notes:** `placeholderContent` flag keeps invented case-study text out of production (§5.6, §8.2); CI tests both a production and a draft build, and Lighthouse runs on the draft build so case study routes are measured (§7.1); `/projects` index still deferred (§3) |
+| 3.3 | **M5 build notes:** real PGSinKokrajhar screenshot; Pexit architecture diagram; separate `coverApproved` and `diagramApproved` gates for employer media (§5.6, §8.2); images optimised to AVIF/WebP by sharp |
 
 ---
 
@@ -344,7 +345,7 @@ The schemas live in **`src/content.config.ts`**, which is the source of truth (t
 | `profile.json` | One object keyed by id (`{ "main": { … } }`) | name, title, statement, subline, description, location, experienceSummary, email, openToWork, socials, `resume { path, published }`, about, education[] |
 | `experience.json` | Array; each entry has a stable, unique `id` (e.g. `updot-pexit`) | company, product?, role, `start`/`end` as `YYYY-MM` (`end: null` = present, must be ≥ start), 1–3 bullets, tech[], evidence[] |
 | `skills.json` | Array of 3 groups with ids `backend` / `frontend` / `delivery` | items[] of `{ name, usedIn[] }` where `usedIn` holds project or experience ids |
-| `projects/<slug>.mdx` | id = file name; frontmatter + MDX case study body | title, summary, `ownership` (personal / freelance-client / employer / agency-client), `featuredRank?`, `clientOrder?`, `facts?` (required when featured), contribution, outcome, evidence[], cover? + coverAlt, **`publicationApproved`** (the card), **`caseStudyApproved`** (the case study page), **`placeholderContent`** (body is placeholder text), live?, code?, tags[] |
+| `projects/<slug>.mdx` | id = file name; frontmatter + MDX case study body | title, summary, `ownership` (personal / freelance-client / employer / agency-client), `featuredRank?`, `clientOrder?`, `facts?` (required when featured), contribution, outcome, evidence[], cover? + coverAlt, **`publicationApproved`** (the card), **`caseStudyApproved`** (the case study page), **`placeholderContent`** (body is placeholder text), `coverApproved` (screenshot, default true), `diagram?` + `diagramApproved` (inline diagram for private work), live?, code?, tags[] |
 
 Prominence (`featuredRank`) and ownership are independent: a freelance or employer project can be featured, and agency client work appears in the compact list ordered by `clientOrder`.
 
@@ -445,6 +446,7 @@ Each milestone is a PR with a Vercel preview link.
 |---|---|
 | **Public résumé** | Decide: publish the current PDF (includes phone number), or a web version without it. Until then, the Résumé link points to LinkedIn and `resume.published = false`. |
 | **Employer case study (Pexit)** | Written OK from Updot to describe the architecture publicly, and for which screenshots/diagrams (`caseStudyApproved`). Until then the Pexit card shows only the scope already public on the résumé (`publicationApproved: true`) and no case study. |
+| **Employer media (Pexit)** | Updot's OK for the architecture diagram (`diagramApproved`) and any product screenshot (`coverApproved: false` until then). Screenshots should show realistic demo data, not test fixtures. |
 | **Client work naming** | Confirm each client in §5.4 may be named. Until then they are `publicationApproved: false`, so they appear only in draft builds. |
 | **Claims** | Every row in §5.4 is either evidenced or switched to its fallback wording. |
 | **Case study text** | Each case study's placeholder text is replaced with the real story and its `placeholderContent` flag removed. Production builds skip flagged pages automatically. |
