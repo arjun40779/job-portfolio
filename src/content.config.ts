@@ -108,6 +108,12 @@ const projects = defineCollection({
         outcome: z.string(), // concrete; numbers need evidence (§5.4)
         evidence: z.array(evidence).default([]),
         cover: image().optional(),
+        // Screenshots of employer systems need permission before they ship.
+        coverApproved: z.boolean().default(true),
+        // An inline diagram used instead of a screenshot (for private work).
+        diagram: z.enum(["pexit-architecture"]).optional(),
+        // Diagrams of employer systems need permission before they ship.
+        diagramApproved: z.boolean().default(false),
         coverAlt: z.string().optional(),
         publicationApproved: z.boolean(), // gate for the card itself
         caseStudyApproved: z.boolean(), // separate gate for the case study page

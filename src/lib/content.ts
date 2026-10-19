@@ -3,6 +3,8 @@ import { getCollection, getEntry, type CollectionEntry } from "astro:content";
 import {
   contentErrors,
   hasCaseStudyPage,
+  showsCover,
+  showsDiagram,
   sortExperience,
   visibleProjects,
 } from "./content-rules";
@@ -21,6 +23,10 @@ export type Project = CollectionEntry<"projects">["data"] & {
   caseStudy: boolean;
   /** The case study is unapproved or still placeholder text. */
   caseStudyDraft: boolean;
+  /** This build shows the project's screenshot (approved, or a draft build). */
+  showCover: boolean;
+  /** This build shows the project's diagram (approved, or a draft build). */
+  showDiagram: boolean;
 };
 export type Role = CollectionEntry<"experience">["data"];
 export type SkillGroup = CollectionEntry<"skills">["data"];
@@ -62,6 +68,8 @@ async function load(): Promise<SiteContent> {
       caseStudy: hasCaseStudyPage(entry.data, showDrafts),
       caseStudyDraft:
         !entry.data.caseStudyApproved || entry.data.placeholderContent,
+      showCover: showsCover(entry.data, showDrafts),
+      showDiagram: showsDiagram(entry.data, showDrafts),
     }),
   );
   const experience = sortExperience(
