@@ -1,6 +1,7 @@
-// Lists the publication gates from docs/DESIGN.md §8.2 that still block
-// launch, by reading the content files. Exits 1 while any gate is open.
-// Usage: pnpm launch:check
+// Checks the publication gates from docs/DESIGN.md §8.2 by reading the
+// content files. Blockers would ship wrong or unfinished content and exit 1.
+// Items held back until approved are listed but don't block: production
+// builds leave them out automatically. Usage: pnpm launch:check
 import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parse } from "yaml";
@@ -14,16 +15,16 @@ function frontmatter(source) {
 }
 
 const blockers = [];
-const block = (gate, detail) => blockers.push({ gate, detail });
+const pending = [];
 
 const profile = JSON.parse(
   await readFile(join(content, "profile.json"), "utf8"),
 ).main;
 if (!profile.resume?.published) {
-  block(
+  pending.push([
     "Public résumé",
     "resume.published is false, so Résumé links point to LinkedIn",
-  );
+  ]);
 }
 
 const files = (await readdir(join(content, "projects"))).filter((f) =>
@@ -35,36 +36,54 @@ for (const file of files) {
     await readFile(join(content, "projects", file), "utf8"),
   );
   const featured = p.featuredRank !== undefined;
+  const ships = p.publicationApproved === true;
 
-  if (!p.publicationApproved)
-    block("Client work naming", `${id}: publicationApproved is false`);
-  if (featured && p.placeholderContent)
-    block("Case study text", `${id}: placeholderContent is true`);
-  if (featured && !p.caseStudyApproved)
-    block("Employer case study", `${id}: caseStudyApproved is false`);
-  if (p.diagram && !p.diagramApproved)
-    block("Employer media", `${id}: diagramApproved is false`);
-  if (p.cover && p.coverApproved === false)
-    block("Employer media", `${id}: coverApproved is false`);
-  if (featured && !p.cover && !(p.diagram && p.diagramApproved)) {
-    block("Project evidence", `${id}: no approved screenshot or diagram`);
+  if (!ships)
+    pending.push(["Project", `${id}: publicationApproved is false (hidden)`]);
+  if (ships && featured && p.caseStudyApproved && p.placeholderContent) {
+    blockers.push([
+      "Case study text",
+      `${id}: approved case study still has placeholder text`,
+    ]);
+  }
+  if (featured && !p.caseStudyApproved) {
+    pending.push([
+      "Case study",
+      `${id}: caseStudyApproved is false (page hidden)`,
+    ]);
+  }
+  if (p.diagram && !p.diagramApproved) {
+    pending.push(["Media", `${id}: diagramApproved is false (diagram hidden)`]);
+  }
+  if (p.cover && p.coverApproved === false) {
+    pending.push([
+      "Media",
+      `${id}: coverApproved is false (screenshot hidden)`,
+    ]);
   }
 }
 
-// Claims (§5.4) can't be detected from content alone; they stay listed until
-// the register in the design doc is marked resolved.
+// Claims (§5.4): any row still marked ⏳ in the register blocks launch.
 const design = await readFile(join(root, "docs/DESIGN.md"), "utf8");
 const openClaims = (design.match(/⏳/g) ?? []).length;
 if (openClaims > 0)
-  block("Claims", `${openClaims} row(s) in §5.4 still marked ⏳`);
+  blockers.push(["Claims", `${openClaims} row(s) in §5.4 still marked ⏳`]);
 
-if (blockers.length === 0) {
-  console.log("All publication gates are resolved. Ready to launch.");
-  process.exit(0);
+function print(title, rows) {
+  if (rows.length === 0) return;
+  const width = Math.max(...rows.map(([gate]) => gate.length));
+  console.log(`${title}:`);
+  for (const [gate, detail] of rows)
+    console.log(`  ${gate.padEnd(width)}  ${detail}`);
+  console.log();
 }
 
-console.log(`${blockers.length} launch blocker(s):\n`);
-const width = Math.max(...blockers.map((b) => b.gate.length));
-for (const { gate, detail } of blockers)
-  console.log(`  ${gate.padEnd(width)}  ${detail}`);
-process.exit(1);
+print("Blocking launch", blockers);
+print(
+  "Held back until approved (not blocking; production leaves these out)",
+  pending,
+);
+console.log(
+  blockers.length === 0 ? "Ready to launch." : `${blockers.length} blocker(s).`,
+);
+process.exit(blockers.length === 0 ? 0 : 1);

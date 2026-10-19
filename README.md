@@ -2,7 +2,7 @@
 
 Personal portfolio site for job hunting. It shows projects, experience and skills. Built with Astro and Tailwind CSS, and deployed to `arjun.buzz`.
 
-**Status:** M6 (launch-ready code; run `pnpm launch:check` to see the content gates still open, and see docs/DESIGN.md §8.4 for the launch runbook). The component preview lives at `/styleguide`; run `SHOW_DRAFTS=true pnpm build` to include unapproved content. See [`docs/DESIGN.md`](docs/DESIGN.md) for the stack, information architecture, visual design, content contract and launch checks.
+**Status:** Launch-ready. `pnpm launch:check` passes; the Pexit case study and diagram stay hidden until Updot approves them. See docs/DESIGN.md §8.4 for the launch runbook. The component preview lives at `/styleguide`; run `SHOW_DRAFTS=true pnpm build` to include unapproved content. See [`docs/DESIGN.md`](docs/DESIGN.md) for the stack, information architecture, visual design, content contract and launch checks.
 
 ## Development
 

@@ -5,16 +5,13 @@ ownership: freelance-client
 featuredRank: 2
 facts:
   role: Sole developer (freelance)
-  team: Solo, working directly with the owner
-  timeline: Jan – Mar 2026
+  team: Solo (freelance)
+  timeline: "2026"
   scope: Listings, bookings, auth
 contribution: I built the whole product on Next.js, Sanity and Supabase, including listing management and role-based sign-in.
 outcome: Live at pginkokrajhar.com, where the owner manages listings and guests check availability online.
 publicationApproved: true
 caseStudyApproved: true
-# Placeholder case study text written for layout review. Replace it with the
-# real story, then remove this flag to publish the page (DESIGN.md §8.2).
-placeholderContent: true
 live: https://pginkokrajhar.com
 cover: ../../assets/projects/pginkokrajhar-home.png
 coverAlt: The PG in Kokrajhar home page, with a booking headline, resident and room counts, and a photo of a furnished room.
@@ -23,28 +20,26 @@ tags: [Next.js, Sanity, Supabase]
 
 ## Problem
 
-The owner ran several paying-guest houses in Kokrajhar and handled every enquiry by phone and WhatsApp. Availability lived in a notebook, so the same room was occasionally promised to two people, and prospective guests had no way to see rooms, photos or prices before calling.
-
-He wanted a site that showed each property properly, let guests request a room without a phone call, and that he could keep up to date himself.
+PG in Kokrajhar offers paying-guest accommodation for students and working professionals. The business needed a website where people could browse rooms and where the owner could manage listings and bookings.
 
 ## What I built
 
-- **Listings from a CMS.** Properties, rooms, photos, amenities and prices are modelled in Sanity, so the owner edits them in Sanity Studio without touching code.
-- **Accounts and roles.** Supabase Auth with two roles: guests, who can request rooms and see their own requests, and the owner, who sees and manages everything.
-- **Availability and booking requests.** Each room has bookings in Supabase Postgres. The listing page shows which dates are free, and a request form creates a pending booking.
-- **Owner dashboard.** A protected page where the owner approves or declines requests. Approving a request blocks those dates for everyone else.
-- **Deployment.** Next.js on Vercel, with listing pages statically generated and refreshed by a Sanity webhook when content changes.
+As a freelance engineer I delivered the platform end to end, from requirements to deployment:
+
+- **Listings managed in Sanity CMS**, with room photos served from Sanity's image CDN.
+- **Role-based user authentication** on **Supabase**.
+- **Availability and booking requests** on each listing.
+- **A Next.js frontend deployed on Vercel.**
 
 ## Key decisions
 
-**Sanity for content, Supabase for transactions.** Rooms and photos change rarely and need a friendly editor; bookings change constantly and need a database with constraints. Splitting them let the owner edit content in a polished UI while booking data stayed relational and consistent. The alternative, keeping everything in Supabase, would have meant building an admin UI for photos and text.
+**Content in a CMS, accounts in a database.** Listings live in Sanity, so they can be updated without code changes. Accounts and availability live in Supabase.
 
-**Row-level security instead of a custom API.** Postgres row-level security policies enforce that guests can only read and create their own bookings, and only the owner role can approve them. That kept the backend small, with the rules living next to the data.
+**Role-based access.** Accounts have separate roles, so each user only sees and does what their role allows.
 
-**Static pages with on-demand revalidation.** Listing pages are generated at build time and revalidated through a Sanity webhook, so they load fast on slow mobile connections. Availability is fetched separately, so it is never stale.
+**Next.js on Vercel** for the frontend and deployments.
 
 ## Results
 
-- The site is live at pginkokrajhar.com, and the owner updates rooms, photos and prices himself.
-- Booking requests now arrive through the site with the dates and contact details already filled in, instead of as phone calls.
-- Approving a request blocks those dates automatically, which removed the double-booking problem.
+- The site is live at pginkokrajhar.com.
+- Listing management, availability and role-based accounts are running in production.

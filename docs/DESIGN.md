@@ -18,6 +18,7 @@
 | 3.2 | **M4 build notes:** `placeholderContent` flag keeps invented case-study text out of production (§5.6, §8.2); CI tests both a production and a draft build, and Lighthouse runs on the draft build so case study routes are measured (§7.1); `/projects` index still deferred (§3) |
 | 3.3 | **M5 build notes:** real PGSinKokrajhar screenshot; Pexit architecture diagram; separate `coverApproved` and `diagramApproved` gates for employer media (§5.6, §8.2); images optimised to AVIF/WebP by sharp |
 | 3.4 | **M6 build notes:** Open Graph images generated at build; `ProfilePage` JSON-LD; hash-based CSP via Astro `security.csp`; `vercel.json` security and cache headers; `pnpm launch:check` reports open publication gates (§8.2, §8.4) |
+| 3.5 | **Launch decisions:** case studies rewritten from the résumé and the live sites only (no invented detail); client names approved; claims launched with fallback wording; résumé link stays on LinkedIn until a web PDF is supplied; Pexit case study, diagram and screenshot stay draft until Updot permits; production cards without approved media drop the media slot |
 
 ---
 
@@ -323,11 +324,11 @@ Every numeric or strong claim needs **what was measured, the baseline, how it wa
 
 | Claim (from résumé) | Needed to publish as is | Fallback wording if evidence is unavailable | Status |
 |---|---|---|---|
-| "+25% task efficiency" (Koru, 20+ screens) | Which tasks; how measured (usability test, time-on-task, analytics); before/after values; who measured | "Redesigned 20+ enterprise screens onto a shared, CMS-driven component system for consistent workflows" | ⏳ Needs Arjun |
-| "−30% page load time" (Incero.ai) | Which metric (LCP / TTFB / full load), which pages, tool (Lighthouse / RUM), before/after values | "Moved CMS pages to SSR/ISR and split client bundles to cut shipped JavaScript" | ⏳ Needs Arjun |
-| "Real-time availability" (PGSinKokrajhar) | The mechanism: Supabase Realtime subscriptions, or availability read live on each request? | Describe the actual mechanism (for example "Availability updates live via Supabase Realtime" or "Availability is read from the database on every request") | ⏳ Needs Arjun |
-| Pexit outcomes | Any measurable result (for example latency, test coverage %, modules migrated) and **employer permission** | Scope-based: "Migrated Companies, Profiles, Listings and Posts to a multi-bucket asset service" · "Every backend module documented in OpenAPI and covered by unit + real-Postgres integration tests" | ⏳ Needs Arjun + Updot permission |
-| Client work list (FTI, Altudo, Kohler Health, W5) | Confirm what you personally did on each, and that naming the client is allowed | Label as "Contributed to as part of agency teams", with links only | ⏳ Confirm |
+| "+25% task efficiency" (Koru, 20+ screens) | Which tasks; how measured (usability test, time-on-task, analytics); before/after values; who measured | "Redesigned 20+ enterprise screens onto a shared, CMS-driven component system for consistent workflows" | ✅ Launched with fallback wording |
+| "−30% page load time" (Incero.ai) | Which metric (LCP / TTFB / full load), which pages, tool (Lighthouse / RUM), before/after values | "Moved CMS pages to SSR/ISR and split client bundles to cut shipped JavaScript" | ✅ Launched with fallback wording |
+| "Real-time availability" (PGSinKokrajhar) | The mechanism: Supabase Realtime subscriptions, or availability read live on each request? | Describe the actual mechanism (for example "Availability updates live via Supabase Realtime" or "Availability is read from the database on every request") | ✅ Launched with fallback wording ("availability", no mechanism claimed) |
+| Pexit outcomes | Any measurable result (for example latency, test coverage %, modules migrated) and **employer permission** | Scope-based: "Migrated Companies, Profiles, Listings and Posts to a multi-bucket asset service" · "Every backend module documented in OpenAPI and covered by unit + real-Postgres integration tests" | ✅ Card launched with scope-based wording; case study and diagram stay draft until Updot permits |
+| Client work list (FTI, Altudo, Kohler Health, W5) | Confirm what you personally did on each, and that naming the client is allowed | Label as "Contributed to as part of agency teams", with links only | ✅ Naming confirmed by Arjun for launch |
 
 ### 5.5 Featured projects
 
@@ -399,7 +400,7 @@ job-portfolio/
 | Cache | **Cold**: a fresh Chrome profile per run, storage cleared |
 | Server | `astro preview` in CI, serving the **draft build** (`SHOW_DRAFTS=true`), which is the production build plus draft pages, so case study routes are measured before they ship; repeated against the Vercel preview URL before launch |
 | Routes | `/`, `/projects/pexit/`, `/projects/pginkokrajhar/`. `/404` is checked by axe and E2E instead, because Lighthouse marks down any page served with a 404 status. |
-| Runs | **5 runs per route; the median run is asserted** |
+| Runs | **5 runs per route.** Category scores are asserted on the median run; metric budgets (LCP, CLS, TBT, script size) on the **median value** across runs, since every run can share a 100 score and "median run" would then pick an arbitrary one |
 | Themes | Run in light mode. An axe pass also runs in dark mode (Playwright, `colorScheme: 'dark'`). |
 
 ### 7.2 Budgets (CI fails if exceeded)

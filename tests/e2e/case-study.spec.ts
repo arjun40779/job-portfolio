@@ -1,50 +1,54 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { draftCaseStudies, drafts } from "./env";
+import { allCaseStudies, caseStudies, drafts } from "./env";
 
-test.describe("case studies in production builds", () => {
-  test.skip(drafts, "production-only behaviour");
-
-  test("placeholder case studies are not published", async ({
-    page,
+test.describe("case study publishing", () => {
+  test("only approved case studies exist in production", async ({
     request,
   }) => {
+    test.skip(drafts, "production-only behaviour");
+    for (const { slug, live } of allCaseStudies) {
+      expect((await request.get(`/projects/${slug}/`)).status(), slug).toBe(
+        live ? 200 : 404,
+      );
+    }
+  });
+
+  test("cards link to a case study only when the build has one", async ({
+    page,
+  }) => {
     await page.goto("/");
-    await expect(
-      page.getByRole("link", { name: /Read case study/ }),
-    ).toHaveCount(0);
-    for (const { slug } of draftCaseStudies) {
-      expect((await request.get(`/projects/${slug}/`)).status()).toBe(404);
+    for (const { slug, title } of allCaseStudies) {
+      const link = page
+        .locator(`#project-${slug}`)
+        .getByRole("link", { name: `Read case study (${title})` });
+      if (caseStudies.some((c) => c.slug === slug)) {
+        await expect(link).toHaveAttribute("href", `/projects/${slug}/`);
+      } else {
+        await expect(link).toHaveCount(0);
+      }
     }
   });
 });
 
-test.describe("case studies in draft builds", () => {
-  test.skip(!drafts, "needs SHOW_DRAFTS=true build");
-
-  test("cards link to their case study", async ({ page }) => {
-    await page.goto("/");
-    for (const { slug, title } of draftCaseStudies) {
-      await expect(
-        page
-          .locator(`#project-${slug}`)
-          .getByRole("link", { name: `Read case study (${title})` }),
-      ).toHaveAttribute("href", `/projects/${slug}/`);
-    }
-  });
-
-  for (const [i, { slug, title }] of draftCaseStudies.entries()) {
+test.describe("case study pages", () => {
+  for (const [i, { slug, title, live }] of caseStudies.entries()) {
     test(`${slug} has the case study structure`, async ({ page }) => {
       await page.goto(`/projects/${slug}/`);
       await expect(page).toHaveTitle(`${title} · Arjun Singh`);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
-      await expect(page.getByText("Draft", { exact: true })).toBeVisible();
+      // Only unapproved case studies (draft builds) carry the Draft tag.
+      await expect(page.getByText("Draft", { exact: true })).toHaveCount(
+        live ? 0 : 1,
+      );
 
-      const facts = page.locator("article dl dt");
-      await expect(facts).toHaveText(["Role", "Team", "Timeline", "Scope"]);
-
-      const body = page.locator(".case-study h2");
-      await expect(body).toHaveText([
+      await expect(page.locator("article dl dt")).toHaveText([
+        "Role",
+        "Team",
+        "Timeline",
+        "Scope",
+      ]);
+      await expect(page.locator(".case-study h2")).toHaveText([
         "Problem",
         "What I built",
         "Key decisions",
@@ -55,10 +59,12 @@ test.describe("case studies in draft builds", () => {
       ).toBeVisible();
 
       const nav = page.getByRole("navigation", { name: "Case studies" });
-      const next = draftCaseStudies[(i + 1) % draftCaseStudies.length];
-      await expect(
-        nav.getByRole("link", { name: `Next project: ${next?.title}` }),
-      ).toHaveAttribute("href", `/projects/${next?.slug}/`);
+      const next = caseStudies[(i + 1) % caseStudies.length];
+      if (next && next.slug !== slug) {
+        await expect(
+          nav.getByRole("link", { name: `Next project: ${next.title}` }),
+        ).toHaveAttribute("href", `/projects/${next.slug}/`);
+      }
       await nav.getByRole("link", { name: "Back to work" }).click();
       await expect(page).toHaveURL(/\/#work$/);
     });
@@ -82,12 +88,13 @@ test.describe("case studies in draft builds", () => {
   test("the theme persists when moving between case studies", async ({
     page,
   }) => {
-    await page.goto("/projects/pexit/");
+    const [first, second] = caseStudies;
+    await page.goto(`/projects/${first?.slug}/`);
     await page
       .locator("[data-theme-toggle] label", { hasText: "Dark" })
       .click();
     await page.getByRole("link", { name: /Next project/ }).click();
-    await expect(page).toHaveURL(/\/projects\/pginkokrajhar\/$/);
+    await expect(page).toHaveURL(new RegExp(`/projects/${second?.slug}/$`));
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
     await expect(page.getByRole("radio", { name: "Dark" })).toBeChecked();
   });
