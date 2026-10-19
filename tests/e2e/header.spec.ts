@@ -1,7 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-const LINKEDIN = "https://www.linkedin.com/in/arjun-singh-541554117";
-
 test.describe("header", () => {
   test("has the primary links and a Résumé link", async ({ page }) => {
     await page.goto("/");
@@ -15,10 +13,15 @@ test.describe("header", () => {
         nav.getByRole("link", { name: label, exact: true }),
       ).toHaveAttribute("href", href);
     }
-    // Résumé is gated (DESIGN.md §8.2): it points to LinkedIn until approved.
+    // The phone-free web résumé is published, so Résumé opens the PDF.
     const resume = nav.getByRole("link", { name: "Résumé" });
-    await expect(resume).toHaveAttribute("href", LINKEDIN);
-    await expect(resume).toHaveAttribute("rel", "noopener noreferrer");
+    await expect(resume).toHaveAttribute("href", "/resume.pdf");
+  });
+
+  test("serves the résumé PDF", async ({ request }) => {
+    const response = await request.get("/resume.pdf");
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain("application/pdf");
   });
 
   test("tab order runs skip link, wordmark, links, Résumé, theme", async ({

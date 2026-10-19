@@ -29,7 +29,7 @@
     "end": "2026-06",
     "location": "Remote",
     "bullets": [
-      "Delivered two client products end to end, from requirements to deployment: PGSinKokrajhar, a booking platform, and HorizonVision Group, a CMS-driven agency site."
+      "Delivered two client products end to end, from requirements to deployment: PG in Kokrajhar, a booking platform, and HorizonVision Group, a CMS-driven agency site."
     ],
     "tech": ["Next.js", "Sanity", "Supabase"]
   },
