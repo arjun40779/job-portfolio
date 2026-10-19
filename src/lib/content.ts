@@ -27,6 +27,8 @@ export type Project = CollectionEntry<"projects">["data"] & {
   showCover: boolean;
   /** This build shows the project's diagram (approved, or a draft build). */
   showDiagram: boolean;
+  /** What the media slot shows. Production never shows a placeholder. */
+  media: "cover" | "diagram" | "placeholder" | "none";
 };
 export type Role = CollectionEntry<"experience">["data"];
 export type SkillGroup = CollectionEntry<"skills">["data"];
@@ -53,6 +55,18 @@ export interface SiteContent {
   references: Map<string, Reference>;
 }
 
+function withMedia(project: Omit<Project, "media">): Project {
+  const media =
+    project.showCover && project.cover && project.coverAlt
+      ? "cover"
+      : project.showDiagram
+        ? "diagram"
+        : showDrafts
+          ? "placeholder"
+          : "none";
+  return { ...project, media };
+}
+
 let cached: Promise<SiteContent> | undefined;
 
 async function load(): Promise<SiteContent> {
@@ -60,8 +74,8 @@ async function load(): Promise<SiteContent> {
   if (!profileEntry)
     throw new Error('src/content/profile.json needs a "main" entry');
 
-  const projects: Project[] = (await getCollection("projects")).map(
-    (entry) => ({
+  const projects: Project[] = (await getCollection("projects")).map((entry) =>
+    withMedia({
       ...entry.data,
       id: entry.id,
       draft: !entry.data.publicationApproved,
