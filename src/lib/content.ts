@@ -2,6 +2,7 @@
 import { getCollection, getEntry, type CollectionEntry } from "astro:content";
 import {
   contentErrors,
+  hasCaseStudyPage,
   sortExperience,
   visibleProjects,
 } from "./content-rules";
@@ -14,7 +15,12 @@ export const showDrafts =
 
 export type Project = CollectionEntry<"projects">["data"] & {
   id: string;
+  /** The project itself isn't approved; it only appears in draft builds. */
   draft: boolean;
+  /** This build includes a case study page for the project. */
+  caseStudy: boolean;
+  /** The case study is unapproved or still placeholder text. */
+  caseStudyDraft: boolean;
 };
 export type Role = CollectionEntry<"experience">["data"];
 export type SkillGroup = CollectionEntry<"skills">["data"];
@@ -25,12 +31,18 @@ export interface Reference {
   href: string;
 }
 
+export function caseStudyHref(project: Pick<Project, "id">): string {
+  return `/projects/${project.id}/`;
+}
+
 export interface SiteContent {
   profile: Profile;
   experience: Role[];
   skills: SkillGroup[];
   featured: Project[];
   clientWork: Project[];
+  /** Featured projects with a case study page in this build, in rank order. */
+  caseStudies: Project[];
   /** Anchor targets on the home page for skill "used in" links. */
   references: Map<string, Reference>;
 }
@@ -47,6 +59,9 @@ async function load(): Promise<SiteContent> {
       ...entry.data,
       id: entry.id,
       draft: !entry.data.publicationApproved,
+      caseStudy: hasCaseStudyPage(entry.data, showDrafts),
+      caseStudyDraft:
+        !entry.data.caseStudyApproved || entry.data.placeholderContent,
     }),
   );
   const experience = sortExperience(
@@ -68,6 +83,7 @@ async function load(): Promise<SiteContent> {
   const clientWork = visible
     .filter((p) => p.ownership === "agency-client")
     .sort((a, b) => (a.clientOrder ?? 0) - (b.clientOrder ?? 0));
+  const caseStudies = featured.filter((p) => p.caseStudy);
 
   const references = new Map<string, Reference>();
   for (const p of featured)
@@ -82,6 +98,7 @@ async function load(): Promise<SiteContent> {
     skills,
     featured,
     clientWork,
+    caseStudies,
     references,
   };
 }

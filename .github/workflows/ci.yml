@@ -42,16 +42,28 @@ jobs:
       - name: Unit tests
         run: pnpm test:unit
 
-      - name: Build
-        run: pnpm build
-
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: End-to-end tests
+      - name: Build (production)
+        run: pnpm build
+
+      - name: End-to-end tests (production)
         run: pnpm test:e2e
 
-      - name: Lighthouse budgets
+      # Draft builds add unapproved and placeholder content (e.g. case studies)
+      # so those pages are tested and measured before they can ship.
+      - name: Build (drafts)
+        run: pnpm build
+        env:
+          SHOW_DRAFTS: "true"
+
+      - name: End-to-end tests (drafts)
+        run: pnpm test:e2e
+        env:
+          SHOW_DRAFTS: "true"
+
+      - name: Lighthouse budgets (drafts build, includes case studies)
         run: pnpm lhci
 
       - name: Upload reports
